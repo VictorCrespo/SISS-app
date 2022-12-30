@@ -1,8 +1,13 @@
-
 import { Buttons } from "../Buttons"
+import { InputUser,InputPassword } from "../Inputs"
+import './Login.css'
 
 export function Login(){
-    return (      
-        <Buttons text="Ingresar"/>
+    return (
+        <>
+            <InputUser text="Usuario"/>
+            <InputPassword/>
+        </>
+        
     )
 }
