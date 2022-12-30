@@ -1,0 +1,107 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url('/src/components/fonts/Poppins-Light.otf') format('opentype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Poppins;
+}
+
+#imagen-login{
+    background-image: url(images/login.jpg);
+    background-size: cover;
+    background-position:center;
+    background-repeat:no-repeat;	
+    height: 100%;
+    width: 100%;
+}
+
+#imagen-logo{
+    background-image: url(images/logo.png);
+    background-size: 100%;
+    background-position:center;
+    background-repeat:no-repeat;
+    width: 70%;
+    height: 35%;
+}
+
+.grid-container-design{
+    display: grid;
+    grid-template-columns: 55% 45%;
+    grid-template-rows: 100% 100%;
+    width: 100%;
+    height: 100vh;
+}
+
+.grid-container-data{
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 30% 8% 5% 5% 5%;
+}
+
+.grid-container-interactions{
+    display: grid;
+    grid-template-columns: 20% 35% 25% 20%;
+}
+
+.grid-container-create-acount{
+    display: grid;
+    grid-template-columns: 5% 45% 50%;
+    grid-template-rows: 60% 40%;
+}
+
+.flex-center-items-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-center-items-right{
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+
+.flex-center-items-left{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+#crear-cuenta{
+    width: 100%;
+    height: 83%;
+    font-size: 2vh;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: gray;
+    grid-area: 1/2;
+}
+
+.iniciar-session{
+    font-size: 9vh;
+}
+
+.input-usuario{
+    width: 60%;
+    height: 50%;
+}
+
+.input-contrasena{
+    width: 60%;
+    height: 50%;
+}
+
+#flex-button{
+    grid-area: 1/2;
+}
+
+.button{
+    width: 50%;
+    height: 65%;
+}
+
+#link{
+    grid-area: 1/3;
+}
