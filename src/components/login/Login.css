@@ -38,7 +38,7 @@
 .grid-container-data{
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 30% 8% 5% 5% 5%;
+    grid-template-rows: 30% 8% 8% 8% 5%;
 }
 
 .grid-container-interactions{
@@ -71,20 +71,15 @@
 }
 
 #crear-cuenta{
-    width: 100%;
-    height: 83%;
-    font-size: 2vh;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    color: gray;
     grid-area: 1/2;
 }
 
 .iniciar-session{
-    font-size: 9vh;
+    font-size: 8.5vh;
 }
 
 .input-usuario{
-    width: 60%;
+    width: 70%;
     height: 50%;
 }
 
@@ -99,7 +94,7 @@
 
 .button{
     width: 50%;
-    height: 65%;
+    height: 40%;
 }
 
 #link{
