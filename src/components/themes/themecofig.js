@@ -8,10 +8,10 @@ export const Purple = createTheme({
     },
 });
 
-export const Red = createTheme({
+export const Gray = createTheme({
     palette: {
         primary: {
-            main: "#FF5733",
+            main: "#808181",
         },
     },
 });
