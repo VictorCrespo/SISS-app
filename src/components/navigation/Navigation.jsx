@@ -1,3 +1,10 @@
+import * as React from 'react';
+
+import { 
+    createBrowserRouter,
+    RouterProvider 
+} from 'react-router-dom'
+
 import {
     AppBar,
     Avatar,
@@ -18,8 +25,6 @@ import {
 } from "@mui/material"
 
 
-import * as React from 'react';
-
 import ThemeProvider from "@mui/material/styles/ThemeProvider"
 
 import InboxIcon from '@mui/icons-material/MoveToInbox';
@@ -27,7 +32,45 @@ import MailIcon from '@mui/icons-material/Mail';
 
 import { Purple } from "../themes/themecofig"
 
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: <h1>pruebas1</h1>
+    },
+    {
+        path: "/pruebas2",
+        element: <h1>pruebas2</h1>
+    },
+    {
+        path: "/pruebas3",
+        element: <h1>pruebas3</h1>
+    },
+    {
+        path: "/pruebas4",
+        element: <h1>pruebas4</h1>
+    }
+])
+
 export function Navigation(){
+
+    let botones = [
+        {
+            "text": "pruebas1",
+            "path": "/"
+        },
+        {
+            "text": "pruebas1",
+            "path": "/"
+        },
+        {
+            "text": "pruebas1",
+            "path": "/"
+        },
+        {
+            "text": "pruebas1",
+            "path": "/"
+        }
+    ]
 
     const drawerWidth = 200;
 
@@ -101,7 +144,7 @@ export function Navigation(){
                         <List>
                             {['pruebas1', 'pruebas2', 'pruebas3', 'pruebas4'].map((text, index) => (
                                 <ListItem key={text} disablePadding>
-                                <ListItemButton>
+                                <ListItemButton href='/'>
                                     <ListItemIcon>
                                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                                     </ListItemIcon>
@@ -112,6 +155,10 @@ export function Navigation(){
                         </List>
                     </Box>
                 </Drawer>
+                <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                    <Toolbar />
+                    <RouterProvider router={router}/>
+                </Box>
             </ThemeProvider> 
         </Box>
     )
