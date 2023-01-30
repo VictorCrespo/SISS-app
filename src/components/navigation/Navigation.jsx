@@ -1,44 +1,35 @@
-import AppBar from "@mui/material/AppBar";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import Drawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Tooltip from "@mui/material/Tooltip";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import {
+    AppBar,
+    Avatar,
+    Box,
+    CssBaseline,
+    Drawer,
+    IconButton,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Tooltip,
+    Toolbar,
+    Typography,
+} from "@mui/material"
+
+
 import * as React from 'react';
 
 import ThemeProvider from "@mui/material/styles/ThemeProvider"
 
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import MenuIcon from '@mui/icons-material/Menu';
 
 import { Purple } from "../themes/themecofig"
 
-export function Header(){
+export function Navigation(){
 
-    const drawerWidth = 240;
-
-    const [open, setOpen] = React.useState(false);
-
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
+    const drawerWidth = 200;
 
     /*UserMenu*/
     const profilesettings = ['Cuenta', 'Cerrar sesion'];
@@ -108,7 +99,7 @@ export function Header(){
                     <Toolbar />
                     <Box sx={{ overflow: 'auto' }}>
                         <List>
-                            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+                            {['pruebas1', 'pruebas2', 'pruebas3', 'pruebas4'].map((text, index) => (
                                 <ListItem key={text} disablePadding>
                                 <ListItemButton>
                                     <ListItemIcon>
@@ -121,7 +112,6 @@ export function Header(){
                         </List>
                     </Box>
                 </Drawer>
-
             </ThemeProvider> 
         </Box>
     )
