@@ -30,7 +30,7 @@ import ThemeProvider from "@mui/material/styles/ThemeProvider"
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 
-import { Purple } from "../themes/themecofig"
+import { Purple } from "./themes/themecofig"
 
 const router = createBrowserRouter([
     {
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
     }
 ])
 
-export function Navigation(){
+export function App(){
 
     let botones = [
         {
