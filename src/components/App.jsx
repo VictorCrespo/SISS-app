@@ -32,14 +32,22 @@ import MailIcon from '@mui/icons-material/Mail';
 
 import { Purple } from "./themes/themecofig"
 
+import { Alumnos } from './alumnos/alumnos';
+
+import { Programas } from './programas/Programas'
+
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <h1>pruebas1</h1>
+        element: <h1>Home</h1>
     },
     {
-        path: "/pruebas2",
-        element: <h1>pruebas2</h1>
+        path: "/Formulario",
+        element: <Alumnos/>
+    },
+    {
+        path: "/Inscripcion",
+        element: <Programas/>
     },
     {
         path: "/pruebas3",
@@ -55,20 +63,20 @@ export function App(){
 
     let botones = [
         {
-            "text": "pruebas1",
-            "path": "/"
+            "text": "Fomulario",
+            "route": "/Formulario"
+        },
+        {
+            "text": "Inscripción",
+            "route": "/Inscripcion"
         },
         {
             "text": "pruebas1",
-            "path": "/"
+            "route": "/"
         },
         {
             "text": "pruebas1",
-            "path": "/"
-        },
-        {
-            "text": "pruebas1",
-            "path": "/"
+            "route": "/"
         }
     ]
 
@@ -142,9 +150,9 @@ export function App(){
                     <Toolbar />
                     <Box sx={{ overflow: 'auto' }}>
                         <List>
-                            {['pruebas1', 'pruebas2', 'pruebas3', 'pruebas4'].map((text, index) => (
+                            {botones.map(({ text, route } ,index) => (
                                 <ListItem key={text} disablePadding>
-                                <ListItemButton href='/'>
+                                <ListItemButton href={route}>
                                     <ListItemIcon>
                                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                                     </ListItemIcon>
