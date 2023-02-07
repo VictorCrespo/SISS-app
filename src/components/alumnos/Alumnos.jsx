@@ -135,12 +135,15 @@ export function Alumnos() {
                 />
                 <TextField label="Creditos aprobados %" sx={{width: "27%", marginLeft: "2%"}}/>
             </Box>
-            <Button 
-                variant="contained" 
-                endIcon={<Save/>} 
-                sx={{display: 'flex', alignItems: 'flex-end', justifyItems: 'end', marginTop: "3%"}}>
-                Guardar
-            </Button>
+            <Box sx={{display: 'flex', marginTop: "2%"}}>
+                <div style={{flexGrow: 1}}/>
+                <Button 
+                    variant="contained" 
+                    endIcon={<Save/>} 
+                    sx={{ flexGrow: 0}}>
+                    Guardar
+                </Button>
+            </Box>
         </Box>
         </>
         
