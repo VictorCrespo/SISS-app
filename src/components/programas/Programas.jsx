@@ -1,15 +1,23 @@
 import * as React from 'react';
-import { Card, CardHeader,Typography, CardMedia,CardContent, CardActions,Button, CardActionArea,Box, Paper, Collapse } from "@mui/material";
-import { border } from "@mui/system";
-import Imagen from "../programas/image/image.jpg"
 
+import { 
+    Card,
+    Typography, 
+    CardMedia,
+    CardContent, 
+    CardActions,
+    Button, 
+    Collapse 
+    } from "@mui/material";
+
+import Imagen from "../programas/image/image.jpg"
 
 export function Programas(){
 
-    const [expanded, setExpanded] = React.useState(false);
+    const [expadir, setExpandir] = React.useState(false);
 
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
+    const ExpandirCard = () => {
+        setExpandir(!expadir);
     };
 
     return (
@@ -34,10 +42,10 @@ export function Programas(){
                 </CardContent>
             
                 <CardActions sx={{justifyContent:"space-between"}}>
-                    <Button size="small" variant="text" onClick={handleExpandClick}>Leer mas</Button> 
+                    <Button size="small" variant="text" onClick={ExpandirCard}>Leer mas</Button> 
                     {/* <Button size="small" variant="contained">Inscribirse</Button>  */}
                 </CardActions>
-                <Collapse  in={expanded} timeout="auto" unmountOnExit>
+                <Collapse  in={expadir} timeout="auto" unmountOnExit>
                     <CardContent>
                         <Typography paragraph color={'white'}>Method:</Typography>
                         <Typography paragraph color={'white'}>
@@ -65,7 +73,7 @@ export function Programas(){
                             Set aside off of the heat to let rest for 10 minutes, and then serve.
                         </Typography>
                         <CardActions sx={{justifyContent:'center', marginTop:2}}>
-                            <Button size="small" variant="contained">Inscribirse</Button> 
+                            <Button size="small" variant="contained" sx={{backgroundColor: "#a7a7a7"}}>Inscribirse</Button> 
                         </CardActions>
                     </CardContent>
                 </Collapse>
