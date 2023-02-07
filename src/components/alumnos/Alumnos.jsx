@@ -3,19 +3,23 @@ import * as React from 'react';
 import { 
     Avatar,
     Autocomplete,
+    Badge,
     Box,
+    Button,
     FormControl,
+    IconButton,
     InputLabel,
     MenuItem,
     Select,
     Stack,
     TextField,
     Divider,
-    Typography  
+    Typography,
+    Tooltip  
 
 } from '@mui/material'
 
-import { Purple } from "../themes/themecofig"
+import {AddAPhotoOutlined,Save} from '@mui/icons-material';
 
 export function Alumnos() {
 
@@ -23,12 +27,18 @@ export function Alumnos() {
 
     const [periodo, setPeriodo] = React.useState('');
 
+    const [getImage, setImagen] = React.useState(null);
+
     const comboSexo = (event) => {
         setSex(event.target.value);
     };
     
     const comboPeriodo = (event) => {
         setPeriodo(event.target.value);
+    };
+
+    const Imagen = (event) => {
+        setImagen(URL.createObjectURL(event.target.files[0]));
     };
 
     const carreras = [
@@ -55,12 +65,29 @@ export function Alumnos() {
     ]
 
     return(
+        <>
         <Box component={"form"}>
             <Divider textAlign='left'>
                 <Typography variant="h6" color={"#2b0085"} >Datos Personales</Typography>
             </Divider>
             <Stack direction={"row"} sx={{marginTop: "1%"}}>
-                <Avatar alt= "Remy Sharp" sx={{width: "150px", height: "150px"}} />
+                <Badge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    badgeContent={
+                        <Tooltip title="Subir Foto">
+                            <IconButton aria-label="upload picture" component="label" sx={{ p: 0 }}>
+                                <input hidden accept="image/*" type="file" onChange={Imagen} />     
+                                <Avatar>
+                                    <AddAPhotoOutlined/>
+                                </Avatar>
+                            </IconButton>
+                        </Tooltip>
+                    }
+                >
+                    <Avatar alt= "Remy Sharp" src={getImage} sx={{width: "150px", height: "150px"}} />
+                </Badge>
+
             </Stack>
             <Box display={'flex'} mt={5} sx={{ minWidth: 120 }}>
                 <TextField label="Nombre completo" sx={{width: "30%"}}/>
@@ -84,7 +111,7 @@ export function Alumnos() {
             <Box display={'flex'} mt={5} sx={{ minWidth: 120 }}>
                 <TextField label="No. Control" sx={{width: "15%"}}/>
                 <Autocomplete 
-                    isablePortal  
+                    disablePortal 
                     options={carreras} 
                     sx ={{width: "25%", marginLeft: "2%"}} 
                     renderInput={(params) => <TextField {...params} label="Carrera" />}
@@ -101,13 +128,21 @@ export function Alumnos() {
                     </Select>
                 </FormControl>
                 <Autocomplete 
-                    isablePortal  
+                    disablePortal  
                     options={semestres} 
                     sx ={{width: "10%", marginLeft: "2%"}} 
                     renderInput={(params) => <TextField {...params} label="Semestre" />}
                 />
                 <TextField label="Creditos aprobados %" sx={{width: "27%", marginLeft: "2%"}}/>
             </Box>
+            <Button 
+                variant="contained" 
+                endIcon={<Save/>} 
+                sx={{display: 'flex', alignItems: 'flex-end', justifyItems: 'end', marginTop: "3%"}}>
+                Guardar
+            </Button>
         </Box>
+        </>
+        
     );
 }
