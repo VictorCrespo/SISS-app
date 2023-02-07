@@ -18,7 +18,6 @@ import {
     ListItemIcon,
     ListItemText,
     Menu,
-    MenuItem,
     Tooltip,
     Toolbar,
     Typography,
@@ -27,8 +26,7 @@ import {
 
 import ThemeProvider from "@mui/material/styles/ThemeProvider"
 
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import { Create,School,Assignment,AccountCircle,Logout } from '@mui/icons-material';
 
 import { Purple } from "./themes/themecofig"
 
@@ -36,13 +34,15 @@ import { Alumnos } from './alumnos/alumnos';
 
 import { Programas } from './programas/Programas'
 
+import Logo from './image/SISS.png'
+
 const router = createBrowserRouter([
     {
         path: "/",
         element: <h1>Home</h1>
     },
     {
-        path: "/Formulario",
+        path: "/Cuenta",
         element: <Alumnos/>
     },
     {
@@ -50,48 +50,57 @@ const router = createBrowserRouter([
         element: <Programas/>
     },
     {
-        path: "/pruebas3",
-        element: <h1>pruebas3</h1>
+        path: "/Alumnos",
+        element: <h1>Alumnos</h1>
     },
     {
-        path: "/pruebas4",
-        element: <h1>pruebas4</h1>
+        path: "/Programas",
+        element: <h1>Programas</h1>
     }
 ])
 
 export function App(){
 
+    const drawerWidth = 200;
+
     let botones = [
         {
-            "text": "Fomulario",
-            "route": "/Formulario"
-        },
-        {
             "text": "Inscripción",
-            "route": "/Inscripcion"
+            "route": "/Inscripcion",
+            "icon": <Create/>
         },
         {
-            "text": "pruebas1",
-            "route": "/"
+            "text": "Alumnos",
+            "route": "/Alumnos",
+            "icon": <School/>
         },
         {
-            "text": "pruebas1",
-            "route": "/"
+            "text": "Programas",
+            "route": "/Programas",
+            "icon": <Assignment/>
         }
     ]
 
-    const drawerWidth = 200;
-
-    /*UserMenu*/
-    const profilesettings = ['Cuenta', 'Cerrar sesion'];
+    const opcionesPerfil = [
+        {
+            "text": "Cuenta",
+            "route": "/Cuenta",
+            "icon": <AccountCircle/>
+        },
+        {
+            "text": "Cerra sesión",
+            "route": "/Login",
+            "icon": <Logout/>
+        }
+    ];
 
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-    const handleOpenUserMenu = (event) => {
+    const abrirMenuPerfil = (event) => {
         setAnchorElUser(event.currentTarget);
     };
 
-    const handleCloseUserMenu = () => {
+    const cerrarMenuPerfil = () => {
         setAnchorElUser(null);
     };
 
@@ -101,16 +110,13 @@ export function App(){
             <ThemeProvider theme={Purple}>
                 <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                     <Toolbar>
-                        <Typography 
-                            variant="h4" 
-                            component="div" 
-                            sx={{ flexGrow: 1 }}
-                        >
-                            Logo
-                        </Typography>
+                        <a href='/'>
+                            <img src={Logo} width = {150}/>
+                        </a>
+                        <div style={{flexGrow: 1}}/>
                         <Box sx={{ flexGrow: 0 }}>
                             <Tooltip title="Abrir opciones">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                            <IconButton onClick={abrirMenuPerfil} sx={{ p: 0 }}>
                                 <Avatar alt="" src="" />
                             </IconButton>
                             </Tooltip>
@@ -128,13 +134,20 @@ export function App(){
                                     horizontal: 'right',
                                 }}
                                 open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
+                                onClose={cerrarMenuPerfil}
                             >
-                                {profilesettings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
-                                    </MenuItem>
-                                ))}
+                                <List>
+                                    {opcionesPerfil.map(({ text, route, icon }) => (
+                                        <ListItem key={text} disablePadding>
+                                        <ListItemButton onClick={cerrarMenuPerfil} href={route}>
+                                            <ListItemIcon>
+                                                {icon}
+                                            </ListItemIcon>
+                                            <ListItemText primary={text} />
+                                        </ListItemButton>
+                                        </ListItem>
+                                    ))}
+                                </List>
                             </Menu>
                         </Box>
                     </Toolbar>
@@ -150,11 +163,11 @@ export function App(){
                     <Toolbar />
                     <Box sx={{ overflow: 'auto' }}>
                         <List>
-                            {botones.map(({ text, route } ,index) => (
+                            {botones.map(({ text, route, icon }) => (
                                 <ListItem key={text} disablePadding>
                                 <ListItemButton href={route}>
                                     <ListItemIcon>
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                        {icon}
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
                                 </ListItemButton>
