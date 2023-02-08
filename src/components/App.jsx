@@ -32,7 +32,7 @@ import { Purple } from "./themes/themecofig"
 
 import { Micuenta } from './micuenta/Micuenta';
 
-import { Programas } from './programas/Programas'
+import { Inscripcion } from './inscripcion/Inscripcion'
 
 import Logo from './image/SISS.png'
 
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/Inscripcion",
-        element: <Programas/>
+        element: <Inscripcion/>
     },
     {
         path: "/Alumnos",
