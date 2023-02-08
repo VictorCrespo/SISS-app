@@ -12,7 +12,7 @@ import {
 
 import Imagen from "../programas/image/image.jpg"
 
-export function Programas(){
+export function Inscripcion(){
 
     const [expadir, setExpandir] = React.useState(false);
 
