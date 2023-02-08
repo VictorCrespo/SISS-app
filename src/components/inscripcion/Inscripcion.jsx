@@ -10,7 +10,7 @@ import {
     Collapse 
     } from "@mui/material";
 
-import Imagen from "../programas/image/image.jpg"
+import Imagen from "../inscripcion/image/image.jpg"
 
 export function Inscripcion(){
 
