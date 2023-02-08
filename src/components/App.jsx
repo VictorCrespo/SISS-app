@@ -30,7 +30,7 @@ import { Create,School,Assignment,AccountCircle,Logout } from '@mui/icons-materi
 
 import { Purple } from "./themes/themecofig"
 
-import { Alumnos } from './alumnos/alumnos';
+import { Micuenta } from './micuenta/Micuenta';
 
 import { Programas } from './programas/Programas'
 
@@ -43,7 +43,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/Cuenta",
-        element: <Alumnos/>
+        element: <Micuenta/>
     },
     {
         path: "/Inscripcion",
