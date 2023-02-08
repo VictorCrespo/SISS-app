@@ -21,7 +21,7 @@ import {
 
 import {AddAPhotoOutlined,Save} from '@mui/icons-material';
 
-export function Alumnos() {
+export function Micuenta() {
 
     const [sexo, setSex] = React.useState('');
 
