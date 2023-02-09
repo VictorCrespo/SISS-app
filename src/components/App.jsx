@@ -34,6 +34,10 @@ import { Micuenta } from './micuenta/Micuenta';
 
 import { Inscripcion } from './inscripcion/Inscripcion'
 
+import { Programas } from './programas/Programas'
+
+import { Alumnos } from './alumnos/Alumnos';
+
 import Logo from './image/SISS.png'
 
 const router = createBrowserRouter([
@@ -51,11 +55,11 @@ const router = createBrowserRouter([
     },
     {
         path: "/Alumnos",
-        element: <h1>Alumnos</h1>
+        element: <Alumnos/>
     },
     {
         path: "/Programas",
-        element: <h1>Programas</h1>
+        element: <Programas/>
     }
 ])
 
