@@ -7,6 +7,7 @@ import {
     Box,
     Button,
     FormControl,
+    Grid,
     IconButton,
     InputLabel,
     MenuItem,
@@ -20,6 +21,8 @@ import {
 } from '@mui/material'
 
 import {AddAPhotoOutlined,Save} from '@mui/icons-material';
+
+import ImagenMicuenta from './images/Micuenta.svg'
 
 export function Micuenta() {
 
@@ -65,87 +68,96 @@ export function Micuenta() {
     ]
 
     return(
-        <>
-        <Box component={"form"}>
-            <Divider textAlign='left'>
-                <Typography variant="h6" color={"#2b0085"} >Datos Personales</Typography>
-            </Divider>
-            <Stack direction={"row"} sx={{marginTop: "1%"}}>
-                <Badge
-                    overlap="circular"
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    badgeContent={
-                        <Tooltip title="Subir Foto">
-                            <IconButton aria-label="upload picture" component="label" sx={{ p: 0 }}>
-                                <input hidden accept="image/*" type="file" onChange={Imagen} />     
-                                <Avatar>
-                                    <AddAPhotoOutlined/>
-                                </Avatar>
-                            </IconButton>
-                        </Tooltip>
-                    }
-                >
-                    <Avatar alt= "Remy Sharp" src={getImage} sx={{width: "150px", height: "150px"}} />
-                </Badge>
-
-            </Stack>
-            <Box display={'flex'} mt={5} sx={{ minWidth: 120 }}>
-                <TextField label="Nombre completo" sx={{width: "30%"}}/>
-                <FormControl sx={{width: "10%", marginLeft: "2%"}}>
-                    <InputLabel id="sexo">Sexo</InputLabel>
-                    <Select
-                    value={sexo}
-                    label="Sexo"
-                    onChange={comboSexo}
-                    >
-                    <MenuItem value={'Hombre'}>Hombre</MenuItem>
-                    <MenuItem value={'Mujer'}>Mujer</MenuItem>
-                    </Select>
-                </FormControl>
-                <TextField label="Teléfono" sx={{width: "15%", marginLeft: "2%"}}/>
-                <TextField label="Dirección" sx={{width: "39%", marginLeft: "2%"}}/>
-            </Box>
-            <Divider textAlign='left' sx={{marginTop: "2%"}}>
-                <Typography variant="h6" color={"#2b0085"} >Datos Escolares</Typography>
-            </Divider>
-            <Box display={'flex'} mt={5} sx={{ minWidth: 120 }}>
-                <TextField label="No. Control" sx={{width: "15%"}}/>
-                <Autocomplete 
-                    disablePortal 
-                    options={carreras} 
-                    sx ={{width: "25%", marginLeft: "2%"}} 
-                    renderInput={(params) => <TextField {...params} label="Carrera" />}
-                />
-                <FormControl sx={{width: "15%", marginLeft: "2%"}}>
-                    <InputLabel id='Periodo'>Periodo</InputLabel>
-                    <Select
-                    value={periodo}
-                    label="periodo"
-                    onChange={comboPeriodo}
-                    >
-                    <MenuItem value={'Agosto-Diciembre'}>Agosto-Diciembre</MenuItem>
-                    <MenuItem value={'Frebrero-Junio'}>Frebrero-Junio</MenuItem>
-                    </Select>
-                </FormControl>
-                <Autocomplete 
-                    disablePortal  
-                    options={semestres} 
-                    sx ={{width: "10%", marginLeft: "2%"}} 
-                    renderInput={(params) => <TextField {...params} label="Semestre" />}
-                />
-                <TextField label="Creditos aprobados %" sx={{width: "27%", marginLeft: "2%"}}/>
-            </Box>
-            <Box sx={{display: 'flex', marginTop: "2%"}}>
-                <div style={{flexGrow: 1}}/>
-                <Button 
-                    variant="contained" 
-                    endIcon={<Save/>} 
-                    sx={{ flexGrow: 0}}>
-                    Guardar
-                </Button>
-            </Box>
-        </Box>
-        </>
-        
+        <Grid container>
+            <Grid item xl={5}>
+                <Box component={"form"}>
+                    <Divider textAlign='left'>
+                        <Typography variant="h6" color={"#2b0085"} >Datos Personales</Typography>
+                    </Divider>
+                    <Stack direction={"row"} mt={3}>
+                        <Badge
+                            overlap="circular"
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                            badgeContent={
+                                <Tooltip title="Subir Foto">
+                                    <IconButton aria-label="upload picture" component="label" sx={{ p: 0 }}>
+                                        <input hidden accept="image/*" type="file" onChange={Imagen} />     
+                                        <Avatar>
+                                            <AddAPhotoOutlined/>
+                                        </Avatar>
+                                    </IconButton>
+                                </Tooltip>
+                            }
+                        >
+                            <Avatar alt= "Remy Sharp" src={getImage} sx={{width: "150px", height: "150px"}} />
+                        </Badge>
+                    </Stack>
+                    <Box display={'flex'} mt={5}>
+                        <TextField label="Nombre completo" sx={{width: "70%"}}/>
+                        <FormControl sx={{width: "30%", marginLeft: "2%"}}>
+                            <InputLabel id="sexo">Sexo</InputLabel>
+                            <Select
+                            value={sexo}
+                            label="Sexo"
+                            onChange={comboSexo}
+                            >
+                            <MenuItem value={'Hombre'}>Hombre</MenuItem>
+                            <MenuItem value={'Mujer'}>Mujer</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+                    <Box display={'flex'} mt={5}>
+                        <TextField label="Teléfono" sx={{width: "25%"}}/>
+                        <TextField label="Dirección" sx={{width: "75%", marginLeft: "2%"}}/>
+                    </Box>
+                    <Divider textAlign='left' sx={{marginTop: "5%"}}>
+                        <Typography variant="h6" color={"#2b0085"} >Datos Escolares</Typography>
+                    </Divider>
+                    <Box display={'flex'} mt={3}>
+                        <TextField label="No. Control" sx={{width: "40%"}}/>
+                        <Autocomplete 
+                            disablePortal 
+                            options={carreras} 
+                            sx ={{width: "60%", marginLeft: "2%"}} 
+                            renderInput={(params) => <TextField {...params} label="Carrera" />}
+                        />
+                    </Box>
+                    <Box display={'flex'} mt={5}>
+                        <FormControl sx={{width: "40%"}}>
+                            <InputLabel id='Periodo'>Periodo</InputLabel>
+                            <Select
+                            value={periodo}
+                            label="periodo"
+                            onChange={comboPeriodo}
+                            >
+                            <MenuItem value={'Agosto-Diciembre'}>Agosto-Diciembre</MenuItem>
+                            <MenuItem value={'Frebrero-Junio'}>Frebrero-Junio</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <Autocomplete 
+                            disablePortal  
+                            options={semestres} 
+                            sx ={{width: "25%", marginLeft: "2%"}} 
+                            renderInput={(params) => <TextField {...params} label="Semestre" />}
+                        />
+                        <TextField label="Creditos aprobados %" sx={{width: "31%", marginLeft: "2%"}}/>
+                    </Box>
+                    <Box mt={5} sx={{display: 'flex'}}>
+                        <div style={{flexGrow: 1}}/>
+                        <Button 
+                            variant="contained" 
+                            endIcon={<Save/>} 
+                            sx={{ flexGrow: 0}}>
+                            Guardar
+                        </Button>
+                    </Box>
+                </Box>
+            </Grid>
+            <Grid xl={7} display={'flex'} sx={{alignItems:'flex-end',justifyContent:'center'}}>
+                <Box >
+                    <img src={ImagenMicuenta} alt="" style={{width:500, height:500, marginLeft: 200}} />
+                </Box>
+            </Grid>
+        </Grid>
     );
 }
