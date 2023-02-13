@@ -42,7 +42,7 @@ export function Inscripcion(){
                 </CardContent>
             
                 <CardActions sx={{justifyContent:"space-between"}}>
-                    <Button size="small" variant="text" onClick={ExpandirCard}>Leer mas</Button> 
+                    <Button size="small" variant="text" onClick={ExpandirCard} sx={{color:"white"}}>Leer mas</Button> 
                     {/* <Button size="small" variant="contained">Inscribirse</Button>  */}
                 </CardActions>
                 <Collapse  in={expadir} timeout="auto" unmountOnExit>
