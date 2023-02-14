@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 
 import { 
     Box,
@@ -16,29 +16,37 @@ import Imagen from "../inscripcion/image/image.jpg"
 
 export function Inscripcion(){
 
-    const [expadir, setExpandir] = React.useState(false);
+    const [expandedCard, setExpandedCard] = useState(null);
 
-    const ExpandirCard = () => {
-        setExpandir(!expadir);
+    const ExpandirCard = (id) => {
+        if (expandedCard === id) {
+            setExpandedCard(null);
+        } else {
+            setExpandedCard(id);
+        }
     };
 
     let programas = [
         {
+            "id": 1,
+            "titulo": "Oficina servicio social",
+            "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
+            "image": Imagen
+        },
+        {   
+            "id": 2,
             "titulo": "Oficina servicio social",
             "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
             "image": Imagen
         },
         {
+            "id": 3,
             "titulo": "Oficina servicio social",
             "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
             "image": Imagen
         },
-        {
-            "titulo": "Oficina servicio social",
-            "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
-            "image": Imagen
-        },
-        {
+        {   
+            "id": 4,
             "titulo": "Oficina servicio social",
             "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
             "image": Imagen
@@ -48,9 +56,9 @@ export function Inscripcion(){
     return (
             <Box>
                 <Grid container rowSpacing={5} spacing={7}>
-                    {programas.map(({titulo,texto,image}) => (
-                        <Grid item xl={3} lg={4} md={6} sm={12}>
-                            <Card 
+                    {programas.map(({id,titulo,texto,image}) => (
+                        <Grid item xl={3} lg={4} md={6} sm={12} key={id}>
+                            <Card
                                 sx={{backgroundColor:"#1e1e1e"}}
                             >
                                 <CardMedia  
@@ -68,10 +76,10 @@ export function Inscripcion(){
                                     </Typography>
                                 </CardContent>
                                 <CardActions sx={{justifyContent:"space-between"}}>
-                                    <Button size="small" variant="text" onClick={ExpandirCard} sx={{color:"white"}}>Leer mas</Button> 
+                                    <Button size="small" variant="text" onClick={() => ExpandirCard(id)} sx={{color:"white"}}>Leer mas</Button> 
                                     {/* <Button size="small" variant="contained">Inscribirse</Button>  */}
                                 </CardActions>
-                                <Collapse  in={expadir} timeout="auto" unmountOnExit>
+                                <Collapse  in={expandedCard === id} timeout="auto" unmountOnExit>
                                     <CardContent>
                                         <Typography paragraph color={'white'}>Method:</Typography>
                                         <Typography paragraph color={'white'}>
