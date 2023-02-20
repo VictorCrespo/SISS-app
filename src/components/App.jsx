@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 
 import { 
     createBrowserRouter,
@@ -9,6 +9,7 @@ import {
     AppBar,
     Avatar,
     Box,
+    Collapse,
     CssBaseline,
     Drawer,
     IconButton,
@@ -19,14 +20,24 @@ import {
     ListItemText,
     Menu,
     Tooltip,
-    Toolbar,
-    Typography,
+    Toolbar
 } from "@mui/material"
 
 
 import ThemeProvider from "@mui/material/styles/ThemeProvider"
 
-import { Create,School,Assignment,AccountCircle,Logout } from '@mui/icons-material';
+import {
+    AddTask, 
+    AccountCircle,
+    Assignment,
+    Create,
+    ExpandLess,
+    ExpandMore,
+    HowToReg,
+    Logout, 
+    School,
+    TextSnippet
+} from '@mui/icons-material';
 
 import { Purple } from "./themes/themecofig"
 
@@ -36,7 +47,7 @@ import { Inscripcion } from './inscripcion/Inscripcion'
 
 import { Programas } from './programas/Programas'
 
-import { Alumnos } from './alumnos/Alumnos';
+import { Alumnos_Inscritos } from './alumnos-inscritos/Alumnos-inscritos';
 
 import Logo from './image/SISS.png'
 
@@ -46,19 +57,19 @@ const router = createBrowserRouter([
         element: <h1>Home</h1>
     },
     {
-        path: "/Cuenta",
+        path: "/cuenta",
         element: <Micuenta/>
     },
     {
-        path: "/Inscripcion",
+        path: "/inscripcion",
         element: <Inscripcion/>
     },
     {
-        path: "/Alumnos",
-        element: <Alumnos/>
+        path: "/alumnos_inscritos",
+        element: <Alumnos_Inscritos/>
     },
     {
-        path: "/Programas",
+        path: "/programas",
         element: <Programas/>
     }
 ])
@@ -67,24 +78,18 @@ export function App(){
 
     const drawerWidth = 200;
 
-    let botones = [
-        {
-            "text": "Inscripción",
-            "route": "/Inscripcion",
-            "icon": <Create/>
-        },
-        {
-            "text": "Alumnos",
-            "route": "/Alumnos",
-            "icon": <School/>
-        },
-        {
-            "text": "Programas",
-            "route": "/Programas",
-            "icon": <Assignment/>
-        }
-    ]
+    const [abrirmenu,setAbrirmenu] = useState(false);
 
+    const [anchorElUser, setAnchorElUser] = useState(null);
+
+    const abrirMenuPerfil = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const cerrarMenuPerfil = () => {
+        setAnchorElUser(null);
+    };
+    
     const opcionesPerfil = [
         {
             "text": "Cuenta",
@@ -97,16 +102,6 @@ export function App(){
             "icon": <Logout/>
         }
     ];
-
-    const [anchorElUser, setAnchorElUser] = React.useState(null);
-
-    const abrirMenuPerfil = (event) => {
-        setAnchorElUser(event.currentTarget);
-    };
-
-    const cerrarMenuPerfil = () => {
-        setAnchorElUser(null);
-    };
 
     return(
         <Box sx={{ display: 'flex' }}>
@@ -167,16 +162,59 @@ export function App(){
                     <Toolbar />
                     <Box sx={{ overflow: 'auto' }}>
                         <List>
-                            {botones.map(({ text, route, icon }) => (
-                                <ListItem key={text} disablePadding>
-                                <ListItemButton href={route}>
-                                    <ListItemIcon>
-                                        {icon}
-                                    </ListItemIcon>
-                                    <ListItemText primary={text} />
-                                </ListItemButton>
-                                </ListItem>
-                            ))}
+                            <ListItemButton href={'/alumnos_inscritos'} >
+                                <ListItemIcon>
+                                    <HowToReg/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Alumnos Inscritos'} />
+                            </ListItemButton>
+                            <ListItemButton href={'/inscripcion'}>
+                                <ListItemIcon>
+                                    <AddTask/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Inscripción'} />
+                            </ListItemButton>
+                            <ListItemButton href={'/programas'}>
+                                <ListItemIcon>
+                                    <HowToReg/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Programas'} />
+                            </ListItemButton>
+                            <ListItemButton onClick={ () => { setAbrirmenu(!abrirmenu) }}>
+                                <ListItemIcon>
+                                    <TextSnippet/>
+                                </ListItemIcon>
+                                <ListItemText primary={'Datos'} />
+                                {abrirmenu ? <ExpandLess/> : <ExpandMore/>}
+                            </ListItemButton>
+                            <Collapse in={abrirmenu} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    <ListItemButton sx={{ pl: 4 }}>
+                                        <ListItemIcon>
+                                            <School/>
+                                        </ListItemIcon>
+                                        <ListItemText primary={'Alumnos'} />
+                                    </ListItemButton>
+                                    <ListItemButton sx={{ pl: 4 }}>
+                                        <ListItemIcon>
+                                            <School/>
+                                        </ListItemIcon>
+                                        <ListItemText primary={'Dependencias'} />
+                                    </ListItemButton>
+                                    <ListItemButton sx={{ pl: 4 }}>
+                                        <ListItemIcon>
+                                            <School/>
+                                        </ListItemIcon>
+                                        <ListItemText primary={'Modalidades'} />
+                                    </ListItemButton>
+                                    <ListItemButton sx={{ pl: 4 }}>
+                                        <ListItemIcon>
+                                            <School/>
+                                        </ListItemIcon>
+                                        <ListItemText primary={'Tipo de programas'} />
+                                    </ListItemButton>
+                                </List>
+                            </Collapse>
                         </List>
                     </Box>
                 </Drawer>
