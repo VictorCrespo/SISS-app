@@ -9,7 +9,7 @@ import {
     Typography
 } from "@mui/material"
 
-export function Alumnos() {
+export function Alumnos_Inscritos() {
 
     let alumnos = [
         {
