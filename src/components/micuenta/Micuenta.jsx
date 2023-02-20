@@ -238,7 +238,7 @@ export function Micuenta() {
             setOpenError(true);
             return
         }
-
+        
         const data = {
             'nombrecompleto': nombrecompleto,
             'sexo': sexo,
@@ -255,7 +255,7 @@ export function Micuenta() {
 
         try {
 
-            let response;
+            let response,mensaje;
             
             if(nuevoregistro){
                 response = await fetch('http://localhost:8080/alumnos', {
@@ -265,15 +265,17 @@ export function Micuenta() {
                     },
                     body: JSON.stringify(data)
                 });
+                mensaje = 'Datos registrados con éxito'
             }
             else{
-                response = await fetch('http://localhost:8080/alumnos', {
+                response = await fetch('http://localhost:8080/alumnos/3', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 });
+                mensaje = 'Datos modificados con éxito'
             }
             
 
@@ -281,7 +283,7 @@ export function Micuenta() {
                 throw new Error('Error al enviar los datos');
             }
             
-            setMensaje('Datos enviados con éxito');
+            setMensaje(mensaje);
             setOpenMensaje(true);
 
         } catch (error) {
