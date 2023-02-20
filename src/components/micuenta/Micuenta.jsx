@@ -24,11 +24,12 @@ import {
 import {AddAPhotoOutlined,Save} from '@mui/icons-material';
 
 import ImagenMicuenta from './images/Micuenta.svg'
+import { width } from '@mui/system';
 
 
 export function Micuenta() {
 
-    let nuevoregistro = false;
+    const [nuevoregistro,setNuevoregistros] = useState(false);
 
     //Mensaje toast error
     const [openerror,setOpenError] = useState(false);
@@ -39,9 +40,6 @@ export function Micuenta() {
 
     const [mensaje,setMensaje] = useState('');
 
-    //Componentes cargando algun valor
-    const [urlfoto, setUrlFoto] = useState(null);
-    
     const [comboCarrera,setcomboCarrera] = useState([]);
 
     //Valores
@@ -57,11 +55,11 @@ export function Micuenta() {
 
     const [nocontrol, setNocontrol] = useState('');
 
-    const [carrera, setCarrera] = useState(null);
+    const [carrera, setCarrera] = useState('');
 
     const [periodo, setPeriodo] = useState('');
 
-    const [semestre, setSemestre] = useState(null);
+    const [semestre, setSemestre] = useState('');
 
     const [creditos, setCreditos] = useState('');
 
@@ -97,14 +95,17 @@ export function Micuenta() {
 
     async function getDatos() {
         try {
+            
             const response = await fetch('http://localhost:8080/alumnos/3')
+            
             if (response.status === 404){
-                nuevoregistro = true;
-                return
+                setNuevoregistros(true)
+                return  
             }
-            const data = await response.json()
 
-            setUrlFoto(data.foto)
+            const data = await response.json()
+            console.log(data)
+            setFoto(data.foto)
             setNombrecompleto(data.nombrecompleto)
             setSexo(data.sexo)
             setTelefono(data.telefono)
@@ -128,61 +129,166 @@ export function Micuenta() {
 
     const submit = async () => {
         
-        // const data = {
-        //     'nombrecompleto': nombrecompleto,
-        //     'sexo': sexo,
-        //     'domicilio': direccion,
-        //     'telefono': telefono,
-        //     'foto': foto,
-        //     'carrera_id': carrera,
-        //     'no_control': nocontrol,
-        //     'periodo': periodo,
-        //     'semestre': parseInt(semestre),
-        //     'porcentaje_creditos_a': parseInt(creditos),
-        //     'usuario_id': 1
-        // };
+        let expresionregular = /^[A-Za-z ]+$/
 
-        // try {
-        //     const response = await fetch('http://localhost:8080/alumnos', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         },
-        //         body: JSON.stringify(data)
-        //     });
+        if (!foto){
+            setMensajeError('El foto es obligatoria');
+            setOpenError(true);
+            return
+        }
 
-        //     if (!response.ok) {
-        //         throw new Error('Error al enviar los datos');
-        //     }
+        if (nombrecompleto.trim() === ''){
+            setMensajeError('El campo nombre completo es obligatorio');
+            setOpenError(true);
+            return
+        }
+
+        if (!expresionregular.test(nombrecompleto)){
+            setMensajeError('El campo nombre completo tiene caracteres no validos');
+            setOpenError(true);
+            return
+        }
+
+        if (sexo.trim() === ''){
+            setMensajeError('El campo sexo es campo obligatorio');
+            setOpenError(true);
+            return
+        }
+
+        if (telefono.trim()=== ''){
+            setMensajeError('El campo telefono no puede ir vacio');
+            setOpenError(true);
+            return
+        }
+
+        expresionregular = /^[0-9]+$/
+
+        if (!expresionregular.test(telefono)){
+            setMensajeError('El campo telefono solo puede tener numeros');
+            setOpenError(true);
+            return
+        }
+
+        if (telefono.length !== 10){
+            setMensajeError('El campo telefono solo puede 10 caracteres numericos');
+            setOpenError(true);
+            return
+        }
+
+        if (direccion.trim() === ''){
+            setMensajeError('El campo direccion es obligatorio');
+            setOpenError(true);
+            return
+        }
+
+        expresionregular = /^[a-zA-Z0-9#. ]+$/
+
+        if (!expresionregular.test(direccion)){
+            setMensajeError('El campo direccion tiene caracteres no validos');
+            setOpenError(true);
+            return
+        }
+        
+        if (nocontrol.trim() === ''){
+            setMensajeError('El campo no. control es obligatorio');
+            setOpenError(true);
+            return
+        }
+        
+        expresionregular = /^[0-9]+$/
+
+        if (!expresionregular.test(nocontrol)){
+            setMensajeError('El campo no. control tiene caracteres no validos');
+            setOpenError(true);
+            return
+        }
+
+        if (nocontrol.length !== 8){
+            setMensajeError('El campo no. control solo puede tener 8 caracteres numericos');
+            setOpenError(true);
+            return
+        }
+
+        if (!carrera){
+            setMensajeError('El campo carrera es obligatorio');
+            setOpenError(true);
+            return
+        }
+
+        if (periodo.trim()=== ''){
+            setMensajeError('El campo periodo es obligatorio');
+            setOpenError(true);
+            return
+        }
+
+        if (!semestre) {
+            setMensajeError('El campo semestre es obligatorio');
+            setOpenError(true);
+            return
+        }
+
+        if (!creditos){
+            setMensajeError('El campo no creditos aprobados es obligatorio');
+            setOpenError(true);
+            return
+        }
+
+        if (!expresionregular.test(creditos)){
+            setMensajeError('El campo no creditos aprobados tiene caracteres no validos');
+            setOpenError(true);
+            return
+        }
+
+        const data = {
+            'nombrecompleto': nombrecompleto,
+            'sexo': sexo,
+            'domicilio': direccion,
+            'telefono': telefono,
+            'foto': foto,
+            'carrera_id': carrera,
+            'no_control': nocontrol,
+            'periodo': periodo,
+            'semestre': parseInt(semestre),
+            'porcentaje_creditos_a': parseInt(creditos),
+            'usuario_id': 1 //Cambiar el usuario id queda pendiente
+        };
+
+        try {
+
+            let response;
             
-        //     setMensaje('Datos enviados con éxito');
-        //     setOpenMensaje(true);
+            if(nuevoregistro){
+                response = await fetch('http://localhost:8080/alumnos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+            }
+            else{
+                response = await fetch('http://localhost:8080/alumnos', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+            }
+            
 
-        // } catch (error) {
-        //     setMensajeError(error.message);
-        //     setOpenError(true);
-        // }
-        console.log(comboCarrera)
-        console.log(carrera)
+            if (!response.ok) {
+                throw new Error('Error al enviar los datos');
+            }
+            
+            setMensaje('Datos enviados con éxito');
+            setOpenMensaje(true);
 
+        } catch (error) {
+            setMensajeError(error.message);
+            setOpenError(true);
+        }
     }
-
-    const semestres = [
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        '8',
-        '9',
-        '10',
-        '11',
-        '12',
-        '13',
-        '14',
-    ]
 
     return(
         <Grid container>
@@ -209,10 +315,8 @@ export function Micuenta() {
                                                 reader.onload = function () {
                                                     setFoto(reader.result);
                                                 }
-                                                
+
                                                 reader.readAsDataURL(event.target.files[0]);
-                                                
-                                                setUrlFoto(URL.createObjectURL(event.target.files[0]));
                                             }} 
                                         />     
                                         <Avatar>
@@ -222,7 +326,7 @@ export function Micuenta() {
                                 </Tooltip>
                             }
                         >
-                            <Avatar alt= "Remy Sharp" src={urlfoto} sx={{width: "150px", height: "150px"}} />
+                            <Avatar alt= "Remy Sharp" src={foto} sx={{width: "150px", height: "150px"}} />
                         </Badge>
                     </Stack>
                     <Box display={'flex'} mt={5}>
@@ -242,8 +346,8 @@ export function Micuenta() {
                             label="Sexo"
                             onChange={(event) => { setSexo(event.target.value) }}
                             >
-                            <MenuItem value={'Hombre'}>Hombre</MenuItem>
-                            <MenuItem value={'Mujer'}>Mujer</MenuItem>
+                            <MenuItem value={'H'}>Hombre</MenuItem>
+                            <MenuItem value={'M'}>Mujer</MenuItem>
                             </Select>
                         </FormControl>
                     </Box>
@@ -277,14 +381,25 @@ export function Micuenta() {
                             onChange={(event) => { setNocontrol(event.target.value) }} 
                             sx={{width: "40%"}}
                         />
-                        <Autocomplete
-                            disablePortal 
-                            options={comboCarrera}
-                            getOptionLabel={(option) => option.label}
-                            sx ={{width: "60%", marginLeft: "2%"}} 
-                            renderInput={(params) => <TextField required {...params} label="Carrera" />}
-                            onChange={(event, value) => { value && setCarrera(value.id) }}
-                        />
+                        <FormControl sx ={{width: "60%", marginLeft: "2%"}}>
+                            <InputLabel required>Carrera</InputLabel>
+                            <Select
+                            value={carrera}
+                            label="Carrera"
+                            onChange={(event) => { setCarrera(event.target.value) }}
+                            MenuProps={{
+                                style:{
+                                    maxHeight: 160
+                                }
+                            }}
+                            >
+                            {comboCarrera.map((option)=> (
+                                <MenuItem key={option.id} value={option.id}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                            </Select>
+                        </FormControl>
                     </Box>
                     <Box display={'flex'} mt={5}>
                         <FormControl sx={{width: "40%"}}>
@@ -298,14 +413,27 @@ export function Micuenta() {
                             <MenuItem value={'Frebrero-Junio'}>Frebrero-Junio</MenuItem>
                             </Select>
                         </FormControl>
-                        <Autocomplete
-                            disablePortal 
-                            value={semestre}
-                            options={semestres}
-                            sx ={{width: "25%", marginLeft: "2%"}} 
-                            renderInput={(params) => <TextField required {...params} label="Semestre" />}
-                            onChange={(event, value) => { setSemestre(value) }}
-                        />
+                        <Box sx ={{width: "25%", marginLeft: "2%",maxHeight: 50}} >
+                            <FormControl sx={{width:"100%"}}>
+                                <InputLabel required>Semestre</InputLabel>
+                                <Select
+                                    value={semestre}
+                                    label="semestre"
+                                    onChange={(event) => { setSemestre(event.target.value) }}
+                                    MenuProps={{
+                                        style:{
+                                            maxHeight: 180
+                                        }
+                                    }}
+                                >
+                                    {Array.from({length:14},(_,index) => (
+                                        <MenuItem key={index+1} value={index+1}>
+                                        {index+1}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
                         <TextField
                             required
                             value={creditos} 
