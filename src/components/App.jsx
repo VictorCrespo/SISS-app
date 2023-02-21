@@ -41,13 +41,21 @@ import {
 
 import { Purple } from "./themes/themecofig"
 
-import { Micuenta } from './micuenta/Micuenta';
+import { Alumnos_Inscritos } from './alumnos-inscritos/Alumnos-inscritos';
+
+import { Dependencias } from './datos/dependencias/Dependencias';
 
 import { Inscripcion } from './inscripcion/Inscripcion'
 
+import { Micuenta } from './micuenta/Micuenta';
+
+import { Modalidades } from './datos/modalidades/Modalidades'
+
 import { Programas } from './programas/Programas'
 
-import { Alumnos_Inscritos } from './alumnos-inscritos/Alumnos-inscritos';
+import { Tipos_programas } from './datos/tipos-programas/Tipos_programas'
+
+import { Usuarios } from './datos/usuarios/Usuarios'
 
 import Logo from './image/SISS.png'
 
@@ -57,21 +65,37 @@ const router = createBrowserRouter([
         element: <h1>Home</h1>
     },
     {
-        path: "/cuenta",
-        element: <Micuenta/>
+        path: "/alumnos_inscritos",
+        element: <Alumnos_Inscritos/>
     },
     {
         path: "/inscripcion",
         element: <Inscripcion/>
     },
     {
-        path: "/alumnos_inscritos",
-        element: <Alumnos_Inscritos/>
+        path: "/dependencias",
+        element: <Dependencias/>
+    },
+    {
+        path: "/mi_cuenta",
+        element: <Micuenta/>
+    },
+    {
+        path: "/modalidades",
+        element: <Modalidades/>
     },
     {
         path: "/programas",
         element: <Programas/>
-    }
+    },
+    {
+        path: "/tipos_programas",
+        element: <Tipos_programas/>
+    },
+    {
+        path: "/usuarios",
+        element: <Usuarios/>
+    },
 ])
 
 export function App(){
@@ -93,7 +117,7 @@ export function App(){
     const opcionesPerfil = [
         {
             "text": "Cuenta",
-            "route": "/Cuenta",
+            "route": "/mi_cuenta",
             "icon": <AccountCircle/>
         },
         {
@@ -189,25 +213,25 @@ export function App(){
                             </ListItemButton>
                             <Collapse in={abrirmenu} timeout="auto" unmountOnExit>
                                 <List component="div" disablePadding>
-                                    <ListItemButton sx={{ pl: 4 }}>
+                                    <ListItemButton href='/usuarios' sx={{ pl: 4 }}>
                                         <ListItemIcon>
                                             <School/>
                                         </ListItemIcon>
-                                        <ListItemText primary={'Alumnos'} />
+                                        <ListItemText primary={'Usuarios'} />
                                     </ListItemButton>
-                                    <ListItemButton sx={{ pl: 4 }}>
+                                    <ListItemButton href='/dependencias' sx={{ pl: 4 }}>
                                         <ListItemIcon>
                                             <School/>
                                         </ListItemIcon>
                                         <ListItemText primary={'Dependencias'} />
                                     </ListItemButton>
-                                    <ListItemButton sx={{ pl: 4 }}>
+                                    <ListItemButton href='/modalidades' sx={{ pl: 4 }}>
                                         <ListItemIcon>
                                             <School/>
                                         </ListItemIcon>
                                         <ListItemText primary={'Modalidades'} />
                                     </ListItemButton>
-                                    <ListItemButton sx={{ pl: 4 }}>
+                                    <ListItemButton href='/tipos_programas' sx={{ pl: 4 }}>
                                         <ListItemIcon>
                                             <School/>
                                         </ListItemIcon>
