@@ -115,6 +115,7 @@ export function Tipos_programas(){
                     throw new Error('Error al enviar los datos');
                 }
 
+                setFila_selecionada(null);
                 setMensaje(mensaje);
                 setOpenMensaje(true);
                 setEmergente(false)
@@ -332,7 +333,7 @@ export function Tipos_programas(){
                             <FormControlLabel 
                                 control={
                                     <Switch
-                                    checked={activo}
+                                    checked={emergente_activo}
                                     onChange={ () => { setEmergente_activo(!emergente_activo)}}
                                     />
                                 } 
