@@ -33,7 +33,11 @@ export function Tipos_programas(){
 
     const [programas,setProgramas] = useState([]);
 
-    const [filaseleecionada, setFilaselecionada] = useState(null);
+    const [fila_selecionada, setFila_selecionada] = useState(null);
+
+    const [nombre_selccionado,setNombre_seleccionado] = useState('');
+
+    const [botones,setBotones] = useState(true);
 
     const [activo,setactivo] = useState(true);
 
@@ -60,11 +64,107 @@ export function Tipos_programas(){
         }
     } 
 
+    const submit = async () => {
+
+        let response,mensaje;
+
+        if (emergente_datos){
+            
+            let expresionregular = /^[A-Za-z0-9 ]+$/
+
+            if (nombre_selccionado.trim() === '') {
+                setMensajeError('El tipo de programa es obligatorio');
+                setOpenError(true);
+                return
+            }
+    
+            if (!expresionregular.test(nombre_selccionado)){
+                setMensajeError('El tipo de programa tiene caracteres no validos');
+                setOpenError(true);
+                return
+            }
+            
+            const data = {
+                'nombre': nombre_selccionado,
+                'activo': (emergente_activo ? true:false)
+            };
+
+            try {
+                if (emergente_crear){
+                    response = await fetch('http://localhost:8080/tipo_programas', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    mensaje = 'tipo de programa creado con éxito'
+                }
+                else{
+                    response = await fetch('http://localhost:8080/tipo_programas/'+fila_selecionada, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    mensaje = 'tipo de programa modificado con éxito'
+                }
+
+                if (!response.ok){
+                    throw new Error('Error al enviar los datos');
+                }
+
+                setMensaje(mensaje);
+                setOpenMensaje(true);
+                setEmergente(false)
+                setBotones(true)
+                getTipos_programas();
+                
+            } catch (error) {
+                setMensajeError(error.message);
+                setOpenError(true);
+            }
+        }
+        else{
+
+            try {
+                response = await fetch('http://localhost:8080/tipo_programas/'+fila_selecionada,{
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                mensaje = 'Se elimino correctamente'
+
+                if (!response.ok){
+                    throw new Error('Error al enviar los datos');
+                }
+
+                setMensaje(mensaje);
+                setOpenMensaje(true);
+                setEmergente(false)
+                setBotones(true)
+                getTipos_programas();
+
+            } catch (error) {
+                setMensajeError(error.message);
+                setOpenError(true);
+            }
+        }
+    }
+
     const filaSeleccionar = (id) => {
-        if (filaseleecionada === id) {
-            setFilaselecionada(null);
+        if (fila_selecionada === id) {
+            setNombre_seleccionado('');
+            setBotones(true);
+            setFila_selecionada(null);
         } else {
-            setFilaselecionada(id);
+            const seleccionado = programas.find((programas) => programas.id === id );
+            setNombre_seleccionado(seleccionado.nombre);
+            setBotones(false);
+            setFila_selecionada(id);
         }
     }
 
@@ -100,21 +200,43 @@ export function Tipos_programas(){
                     <Button 
                         variant='contained' 
                         sx={{ml:4}} 
-                        onClick={ () => { setEmergente(true); setEmergente_crear(true); setEmergente_datos(true); }}
+                        onClick={ () => 
+                            {  
+                                setBotones(true); 
+                                setFila_selecionada(null);
+                                setNombre_seleccionado(''); 
+                                setEmergente(true); 
+                                setEmergente_crear(true); 
+                                setEmergente_datos(true); 
+                            }
+                        }
                     >
                         Nuevo
                     </Button>
                     <Button 
                         variant='contained' 
                         sx={{ml:4}} 
-                        onClick={ () => { setEmergente(true); setEmergente_crear(false); setEmergente_datos(true); }}
+                        onClick={ () => 
+                            {   
+                                setEmergente(true); 
+                                setEmergente_crear(false); 
+                                setEmergente_datos(true); 
+                            }
+                        }
+                        disabled={botones}
                     >
                         Editar
                     </Button>
                     <Button 
                         variant='contained' 
                         sx={{ml:4}}
-                        onClick = {() => { setEmergente(true); setEmergente_datos(false)}}
+                        onClick = {() => 
+                            { 
+                                setEmergente(true); 
+                                setEmergente_datos(false) 
+                            }
+                        }
+                        disabled={botones}
                     >
                         Borrar
                     </Button>
@@ -146,13 +268,13 @@ export function Tipos_programas(){
                             {programas.filter(({nombre}) => nombre.includes(filtro)).map(({id,nombre}) => (
                             <TableRow
                                 key={id}
-                                selected={filaseleecionada === id}
+                                selected={fila_selecionada === id}
                                 onClick={() => filaSeleccionar(id)}
                             >
                                 <TableCell padding="checkbox" sx={{borderRight:1}}>
                                     <Checkbox 
                                         color="primary"
-                                        checked={filaseleecionada === id}
+                                        checked={fila_selecionada === id}
                                     />
                                 </TableCell>
                                 <TableCell component="th" scope="row">
@@ -197,32 +319,55 @@ export function Tipos_programas(){
             {emergente_datos ? 
                 (
                     <>
-                        <DialogTitle>
-                            <Typography variant='h5' align='center'>
-                                {emergente_crear ? 'Crear tipo de programa': 'Modificar tipo de programa'}
-                            </Typography>
+                        <DialogTitle variant='h6' align='center'>
+                            {emergente_crear ? 'Crear tipo de programa': 'Modificar tipo de programa'}
                         </DialogTitle>
                         <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:150}}>
-                            <TextField label='Tipo programa' sx={{width:250}}/>
+                            <TextField 
+                                value={nombre_selccionado} 
+                                label='Tipo programa' 
+                                onChange={(event) => { setNombre_seleccionado(event.target.value) }}  
+                                sx={{width:250}}
+                            />
                             <FormControlLabel 
                                 control={
-                                    <Switch 
-                                    defaultChecked 
+                                    <Switch
+                                    checked={activo}
                                     onChange={ () => { setEmergente_activo(!emergente_activo)}}
                                     />
                                 } 
                                 label={emergente_activo ? "activo":"inactivo"}
                                 sx={{ml:3}}
                             />
-                            <Button variant='contained' sx={{ml:3}}>{emergente_crear ? 'Crear': 'Guardar' }</Button>
+                            <Button variant='contained' sx={{ml:3}} onClick={submit}>{emergente_crear ? 'Crear': 'Guardar' }</Button>
                         </Box>
                     </>
                 ) : 
                 (
                     <>
-                        <DialogTitle>
-                            <Typography variant='h5' align='center'>Borrar tipo de programa</Typography>
+                        <DialogTitle variant='h5' align='center'>
+                            Borrar tipo de programa
                         </DialogTitle>
+                        <Box>
+                            <Typography variant='h6' align='center'>
+                                Estas seguro que deseas Borrar el programa "{nombre_selccionado}" ?
+                            </Typography>
+                            <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:75}}>
+                                <Button 
+                                    variant='contained' 
+                                    sx={{mr:5}} 
+                                    onClick={ submit }
+                                >
+                                    Aceptar
+                                </Button>
+                                <Button 
+                                    variant='contained'
+                                    onClick={ () => { setEmergente(false) }}
+                                >
+                                    Cancelar
+                                </Button>
+                            </Box>
+                        </Box>
                     </>
                 )}
             </Dialog>
