@@ -321,7 +321,7 @@ export function Modalidades(){
                 (
                     <>
                         <DialogTitle variant='h6' align='center'>
-                            {emergente_crear ? 'Crear tipo de programa': 'Modificar tipo de programa'}
+                            {emergente_crear ? 'Crear Modalidad': 'Modificar Modalidad'}
                         </DialogTitle>
                         <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:150}}>
                             <TextField 
@@ -351,7 +351,7 @@ export function Modalidades(){
                         </DialogTitle>
                         <Box>
                             <Typography variant='h6' align='center'>
-                                Estas seguro que deseas Borrar el programa "{nombre_selccionado}" ?
+                                Estas seguro que deseas Borrar al modalidad "{nombre_selccionado}" ?
                             </Typography>
                             <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:75}}>
                                 <Button 
