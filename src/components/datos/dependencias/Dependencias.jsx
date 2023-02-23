@@ -337,7 +337,7 @@ export function Dependencias(){
                                 value={nombre_selccionado} 
                                 label='Dependencia' 
                                 onChange={(event) => { setNombre_seleccionado(event.target.value) }}  
-                                sx={{width:250}}
+                                sx={{width:300}}
                             />
                             <FormControlLabel 
                                 control={
@@ -347,9 +347,22 @@ export function Dependencias(){
                                     />
                                 } 
                                 label={emergente_activo ? "activo":"inactivo"}
-                                sx={{ml:3}}
+                                sx={{ml:7}}
                             />
-                            <Button variant='contained' sx={{ml:3}} onClick={submit}>{emergente_crear ? 'Crear': 'Guardar' }</Button>
+                        </Box>
+                        <Box display={'flex'} justifyContent={'center'} sx={{height:100}}>
+                            <TextField label='Titular' sx={{width:470}}/>
+                        </Box>
+                        <Box display={'flex'} justifyContent={'center'} sx={{height:100}}>
+                            <TextField label='Puesto' sx={{width:470}}/>
+                        </Box>
+                        <Box display={'flex'} justifyContent={'center'} sx={{height: 100}}>
+                            <TextField label='Domicilio' sx={{width:470}}/>
+                        </Box>
+                        <Box display={'flex'} justifyContent={'center'} sx={{height:70}}>
+                            <Box>
+                                <Button variant='contained' sx={{ml:3}} onClick={submit}>{emergente_crear ? 'Crear': 'Guardar' }</Button>
+                            </Box>
                         </Box>
                     </>
                 ) : 
