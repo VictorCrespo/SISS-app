@@ -164,6 +164,7 @@ export function Modalidades(){
         } else {
             const seleccionado = modalidades.find((modalidades) => modalidades.id === id );
             setNombre_seleccionado(seleccionado.nombre);
+            setEmergente_activo(seleccionado.activo);
             setBotones(false);
             setFila_selecionada(id);
         }
@@ -205,7 +206,8 @@ export function Modalidades(){
                             {  
                                 setBotones(true); 
                                 setFila_selecionada(null);
-                                setNombre_seleccionado(''); 
+                                setNombre_seleccionado('');
+                                setEmergente_activo(true); 
                                 setEmergente(true); 
                                 setEmergente_crear(true); 
                                 setEmergente_datos(true); 
