@@ -37,6 +37,12 @@ export function Dependencias(){
 
     const [nombre_selccionado,setNombre_seleccionado] = useState('');
 
+    const [titular,setTitular] = useState('');
+
+    const [puesto,setPuesto] = useState('');
+
+    const [domicilio,setDomicilio] = useState('');
+
     const [botones,setBotones] = useState(true);
 
     const [activo,setactivo] = useState(true);
@@ -55,7 +61,7 @@ export function Dependencias(){
 
     async function getTipos_programas(){
         try {
-            const response = await fetch('http://localhost:8080/tipo_programas?activo='+ (activo ? 1:0))
+            const response = await fetch('http://localhost:8080/dependencias?activo='+ (activo ? 1:0))
             const data = await response.json()
             setDependencias(data)
         } catch (error) {
@@ -73,7 +79,7 @@ export function Dependencias(){
             let expresionregular = /^[A-Za-z0-9 ]+$/
 
             if (nombre_selccionado.trim() === '') {
-                setMensajeError('El tipo de programa es obligatorio');
+                setMensajeError('La dependencia es obligatorio');
                 setOpenError(true);
                 return
             }
@@ -83,15 +89,58 @@ export function Dependencias(){
                 setOpenError(true);
                 return
             }
+
+            if (titular.trim() === ''){
+                setMensajeError('El titular es obligatorio');
+                setOpenError(true);
+                return
+            }
             
+            expresionregular = /^[A-Za-z ]+$/
+
+            if (!expresionregular.test(titular)){
+                setMensajeError('El titular tiene caracteres no validos');
+                setOpenError(true);
+                return
+            }
+
+            if (puesto.trim() === ''){
+                setMensajeError('El puesto es obligatorio');
+                setOpenError(true);
+                return
+            }
+
+            if(!expresionregular.test(puesto)){
+                setMensajeError('El puesto tiene caracteres no validos');
+                setOpenError(true);
+                return
+            }
+
+            if(domicilio.trim() === ''){
+                setMensajeError('El domicilio es obligatorio');
+                setOpenError(true);
+                return
+            }
+
+            expresionregular = /^[A-Za-z0-9#. ]+$/
+
+            if(!expresionregular.test(domicilio)){
+                setMensajeError('El domicilio tiene caracteres no validos');
+                setOpenError(true);
+                return
+            }
+
             const data = {
                 'nombre': nombre_selccionado,
+                'titular': titular,
+                'puesto': puesto,
+                'domicilio': domicilio,
                 'activo': (emergente_activo ? true:false)
             };
 
             try {
                 if (emergente_crear){
-                    response = await fetch('http://localhost:8080/tipo_programas', {
+                    response = await fetch('http://localhost:8080/dependencias', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -101,7 +150,7 @@ export function Dependencias(){
                     mensaje = 'tipo de programa creado con éxito'
                 }
                 else{
-                    response = await fetch('http://localhost:8080/tipo_programas/'+fila_selecionada, {
+                    response = await fetch('http://localhost:8080/dependencias/'+fila_selecionada, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -130,7 +179,7 @@ export function Dependencias(){
         else{
 
             try {
-                response = await fetch('http://localhost:8080/tipo_programas/'+fila_selecionada,{
+                response = await fetch('http://localhost:8080/dependencias/'+fila_selecionada,{
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -159,11 +208,18 @@ export function Dependencias(){
     const filaSeleccionar = (id) => {
         if (fila_selecionada === id) {
             setNombre_seleccionado('');
+            setTitular('');
+            setPuesto('');
+            setDomicilio('');
             setBotones(true);
             setFila_selecionada(null);
         } else {
             const seleccionado = dependencias.find((dependencias) => dependencias.id === id );
             setNombre_seleccionado(seleccionado.nombre);
+            setTitular(seleccionado.titular);
+            setPuesto(seleccionado.puesto);
+            setDomicilio(seleccionado.domicilio);
+            setEmergente_activo(seleccionado.activo);
             setBotones(false);
             setFila_selecionada(id);
         }
@@ -206,6 +262,10 @@ export function Dependencias(){
                                 setBotones(true); 
                                 setFila_selecionada(null);
                                 setNombre_seleccionado(''); 
+                                setTitular('');
+                                setPuesto('');
+                                setDomicilio('');
+                                setEmergente_activo(true);
                                 setEmergente(true); 
                                 setEmergente_crear(true); 
                                 setEmergente_datos(true); 
@@ -275,7 +335,7 @@ export function Dependencias(){
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {dependencias.filter(({nombre}) => nombre.includes(filtro)).map(({id,nombre}) => (
+                            {dependencias.filter(({nombre}) => nombre.includes(filtro)).map(({id,nombre,titular,puesto,domicilio}) => (
                             <TableRow
                                 key={id}
                                 selected={fila_selecionada === id}
@@ -288,7 +348,16 @@ export function Dependencias(){
                                     />
                                 </TableCell>
                                 <TableCell component="th" scope="row">
-                                <Typography>{nombre}</Typography>
+                                    <Typography>{nombre}</Typography>
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    <Typography>{titular}</Typography>
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    <Typography>{puesto}</Typography>
+                                </TableCell>
+                                <TableCell component="th" scope="row">
+                                    <Typography>{domicilio}</Typography>
                                 </TableCell>
                             </TableRow>
                             ))}
@@ -350,16 +419,25 @@ export function Dependencias(){
                                 sx={{ml:7}}
                             />
                         </Box>
-                        <Box display={'flex'} justifyContent={'center'} sx={{height:100}}>
-                            <TextField label='Titular' sx={{width:470}}/>
-                        </Box>
-                        <Box display={'flex'} justifyContent={'center'} sx={{height:100}}>
-                            <TextField label='Puesto' sx={{width:470}}/>
-                        </Box>
-                        <Box display={'flex'} justifyContent={'center'} sx={{height: 100}}>
-                            <TextField label='Domicilio' sx={{width:470}}/>
-                        </Box>
-                        <Box display={'flex'} justifyContent={'center'} sx={{height:70}}>
+                        <TextField 
+                            value={titular} 
+                            label='Titular'
+                            onChange={(event) => { setTitular(event.target.value) }} 
+                            sx={{width:470, ml:8}}
+                        />
+                        <TextField 
+                            value={puesto} 
+                            label='Puesto'
+                            onChange={(event) => { setPuesto(event.target.value) }}  
+                            sx={{width:470, ml:8, mt:6}}
+                        />
+                        <TextField 
+                            value={domicilio} 
+                            label='Domicilio'
+                            onChange={(event) => { setDomicilio(event.target.value) }}  
+                            sx={{width:470, ml:8,mt:6}}
+                        />
+                        <Box display={'flex'} justifyContent={'center'} sx={{height:70,mt:6}}>
                             <Box>
                                 <Button variant='contained' sx={{ml:3}} onClick={submit}>{emergente_crear ? 'Crear': 'Guardar' }</Button>
                             </Box>
