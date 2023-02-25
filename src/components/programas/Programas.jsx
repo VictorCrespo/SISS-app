@@ -1,29 +1,40 @@
 import { useState,useEffect } from 'react';
 
+import moment from 'moment';
+
+import PropTypes from 'prop-types';
+
 import {
     Alert,
+    Avatar,
+    Badge,
     Box,
     Button,
-    Checkbox,
+    Card,
+    CardActions,
+    CardContent, 
+    CardMedia,
+    Collapse,
     Dialog,
     DialogTitle,
     FormControl,
     FormControlLabel,
+    Grid,
     InputLabel,
+    IconButton,
     MenuItem,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
+    Tab,
+    Tabs,
     TextField,
+    Tooltip,
     Typography,
     Select,
     Snackbar,
+    Stack,
     Switch
 } from '@mui/material'
+
+import {AddAPhotoOutlined} from '@mui/icons-material';
 
 import {  
     DatePicker, 
@@ -31,6 +42,40 @@ import {
 } from '@mui/x-date-pickers/';
 
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+
+import NotImage from './images/Not_image.jpeg'
+
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+            <Box sx={{ p: 3 }}>
+                <Typography>{children}</Typography>
+            </Box>
+            )}
+        </div>
+    );
+}
+
+TabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.number.isRequired,
+    value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+    };
+}
 
 export function Programas() {
 
@@ -40,6 +85,8 @@ export function Programas() {
 
     const [openmensaje,setOpenMensaje] = useState(false);
 
+    const [expandedCard, setExpandedCard] = useState(null);
+
     //Componentes
     const [combodependencias,setCombodependencias] = useState([]);
 
@@ -48,8 +95,14 @@ export function Programas() {
     const [combomodalidades,setCombomodalidades] = useState([]);
 
     const [mensaje,setMensaje] = useState('');
+    
+    const [imagen,setImagen] = useState(null);
 
     const [programas,setProgramas] = useState([]);
+
+    const [programa,setPrograma] = useState('');
+
+    const [capacidad,setCapacidad] = useState('');
 
     const [dependencia,setDependencia] = useState('');
 
@@ -77,34 +130,93 @@ export function Programas() {
 
     const [emergente_datos,setEmergente_datos] = useState(true);
 
+    const [tab, setTab] = useState(0);
+
     const submit = async () => {
 
         let response,mensaje;
-
+        
         if (emergente_datos){
             
             let expresionregular = /^[A-Za-z0-9 ]+$/
 
-            if (nombre_selccionado.trim() === '') {
+            if (programa.trim() === '') {
                 setMensajeError('El tipo de programa es obligatorio');
                 setOpenError(true);
                 return
             }
     
-            if (!expresionregular.test(nombre_selccionado)){
+            if (!expresionregular.test(programa)){
                 setMensajeError('El tipo de programa tiene caracteres no validos');
                 setOpenError(true);
                 return
             }
+
+            if (capacidad.trim() === ''){
+                setMensajeError('La capacidad es obligatoria');
+                setOpenError(true);
+                return
+            }
+
+            expresionregular = /^[0-9]+$/
+
+            if (!expresionregular.test(capacidad)){
+                setMensajeError('La capacidad tiene caracteres no validos');
+                setOpenError(true);
+                return
+            }
             
+            if (parseInt(capacidad) < 1){
+                setMensajeError('La capacidad no puede cero o menor');
+                setOpenError(true);
+                return
+            }
+
+            if (dependencia === null){
+                setMensajeError('La dependencia es obligatoria');
+                setOpenError(true);
+                return
+            }
+
+            if (tipoprograma === null){
+                setMensajeError('El tipo de programa es obligatorio');
+                setOpenError(true);
+                return
+            }
+
+            if (modalidad === null){
+                setMensajeError('La modalidad es obligatoria');
+                setOpenError(true);
+                return
+            }
+
+            if (fecha_inicio.trim() === ''){
+                setMensajeError('La fecha inicial es obligatoria');
+                setOpenError(true);
+                return
+            }
+
+            if (fecha_final.trim() === ''){
+                setMensajeError('La fecha final es obligatoria');
+                setOpenError(true);
+                return
+            }
+
             const data = {
-                'nombre': nombre_selccionado,
+                'imagen': imagen,
+                'nombre': programa,
+                'capacidad': parseInt(capacidad),
+                'dependencia_id': parseInt(dependencia),
+                'tipo_programa_id': parseInt(tipoprograma),
+                'modalidad_id': parseInt(modalidad),
+                'fecha_inicio': fecha_inicio,
+                'fecha_fin': fecha_final,
                 'activo': (emergente_activo ? true:false)
-            };
+            }; 
 
             try {
                 if (emergente_crear){
-                    response = await fetch('http://localhost:8080/modalidades', {
+                    response = await fetch('http://localhost:8080/programas', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -114,7 +226,7 @@ export function Programas() {
                     mensaje = 'tipo de programa creado con éxito'
                 }
                 else{
-                    response = await fetch('http://localhost:8080/modalidades/'+fila_selecionada, {
+                    response = await fetch('http://localhost:8080/programas/'+fila_selecionada, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -128,12 +240,11 @@ export function Programas() {
                     throw new Error('Error al enviar los datos');
                 }
 
-                setFila_selecionada(null);
                 setMensaje(mensaje);
                 setOpenMensaje(true);
                 setEmergente(false)
                 setBotones(true)
-                getModalidades();
+                getProgramas();
                 
             } catch (error) {
                 setMensajeError(error.message);
@@ -143,7 +254,7 @@ export function Programas() {
         else{
 
             try {
-                response = await fetch('http://localhost:8080/modalidades/'+fila_selecionada,{
+                response = await fetch('http://localhost:8080/programas/'+fila_selecionada,{
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -187,24 +298,20 @@ export function Programas() {
         setOpenMensaje(false);
     }
 
+    const ExpandirCard = (id) => {
+        if (expandedCard === id) {
+            setExpandedCard(null);
+        } else {
+            setExpandedCard(id);
+        }
+    };
+
     async function getDependencias () {
         try {
             const response = await fetch('http://localhost:8080/dependencias?activo=1')
             const data = await response.json()
             const opciones = data.map(dependencias => ({ label: dependencias.nombre, id: dependencias.id }));
             setCombodependencias(opciones)
-        } catch (error) {
-            setMensajeError(error.message);
-            setOpenError(true);
-        }
-    }
-
-    async function getTipo_Programas () {
-        try {
-            const response = await fetch('http://localhost:8080/tipo_programas?activo=1')
-            const data = await response.json()
-            const opciones = data.map(tipos_programas => ({ label: tipos_programas.nombre, id: tipos_programas.id }));
-            setCombotipoprogramas(opciones)
         } catch (error) {
             setMensajeError(error.message);
             setOpenError(true);
@@ -223,11 +330,41 @@ export function Programas() {
         }
     }
 
+    async function getProgramas () {
+        try {
+            const response = await fetch('http://localhost:8080/programas?activo='+(activo ? 1:0))
+            const data = await response.json()
+            console.log(data)
+            setProgramas(data)
+        } catch (error) {
+            setMensajeError(error.message);
+            setOpenError(true);
+        }
+    }
+
+    async function getTipo_Programas () {
+        try {
+            const response = await fetch('http://localhost:8080/tipo_programas?activo=1')
+            const data = await response.json()
+            const opciones = data.map(tipos_programas => ({ label: tipos_programas.nombre, id: tipos_programas.id }));
+            setCombotipoprogramas(opciones)
+        } catch (error) {
+            setMensajeError(error.message);
+            setOpenError(true);
+        }
+    }
+
     useEffect( () => {
         getDependencias();
         getTipo_Programas();
         getModalidades();
     },[]);
+
+    useEffect( () => {
+        getProgramas();
+    },[activo]);
+
+
 
     return (
         <Box>
@@ -245,7 +382,7 @@ export function Programas() {
                                 setEmergente_activo(true); 
                                 setEmergente(true); 
                                 setEmergente_crear(true); 
-                                setEmergente_datos(true); 
+                                setEmergente_datos(true);
                             }
                         }
                     >
@@ -263,6 +400,41 @@ export function Programas() {
                     } 
                     label={activo ? "activos":"inactivos"}
                 />
+            </Box>
+            <Box>
+                <Grid container rowSpacing={5} spacing={7}>
+                    {programas.filter(({nombre}) => nombre.includes(filtro)).map(({id,nombre,fecha_inicio,fecha_fin,imagen}) => (
+                        <Grid item xl={3} lg={4} md={6} sm={12} key={id}>
+                            <Card
+                                sx={{backgroundColor:"#797880d1"}}
+                            >
+                                <CardMedia  
+                                    component="img" 
+                                    src={imagen ? imagen:NotImage}
+                                    height = "150"
+                                />
+                                <CardContent>
+                                    <Typography gutterBottom variant="h5" color={"white"} component="div">
+                                        {nombre}
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{justifyContent:"space-between"}}>
+                                    <Button size="small" variant="text" onClick={() => ExpandirCard(id)} sx={{color:"white"}}>Leer mas</Button>
+                                </CardActions>
+                                <Collapse  in={expandedCard === id} timeout="auto" unmountOnExit>
+                                    <CardContent>
+                                        <Typography variant="body2" color={"white"} sx={{mt:2}}>
+                                            Fecha de inicio: {moment(fecha_inicio).format("DD/MM/YYYY")}
+                                        </Typography>
+                                        <Typography variant="body2" color={"white"} sx={{mt:2}}>
+                                            Fecha de fin: {moment(fecha_fin).format("DD/MM/YYYY")}
+                                        </Typography>
+                                    </CardContent>
+                                </Collapse>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
             </Box>
             <Snackbar 
                 open={openerror} 
@@ -300,123 +472,168 @@ export function Programas() {
                         <DialogTitle variant='h6' align='center'>
                             {emergente_crear ? 'Crear programa': 'Modificar programa'}
                         </DialogTitle>
-                        <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"5%"}}>
-                            <TextField 
-                                label='Programa' 
-                                sx={{width:"50%"}}
-                            />
-                            <FormControlLabel 
-                                control={
-                                    <Switch
-                                    checked={emergente_activo}
-                                    onChange={ () => { setEmergente_activo(!emergente_activo)}}
+                        <Box>
+                            <Tabs value={tab} onChange={(event,newValue) =>{ setTab(newValue)}}>
+                                <Tab label="Programa" {...a11yProps(0)}/>
+                                <Tab label="Actividades" {...a11yProps(1)}/>
+                            </Tabs>
+                        </Box>
+                        <Box>
+                            <TabPanel value={tab} index={0}>
+                                <Stack direction={"row"} mt={3}>
+                                    <Badge
+                                        overlap="circular"
+                                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                        badgeContent={
+                                            <Tooltip title="Subir Foto">
+                                                <IconButton aria-label="upload picture" component="label" sx={{ p: 0, ml: "180px", mt:"40px" }} >
+                                                    <input 
+                                                        hidden 
+                                                        accept="image/*" 
+                                                        type="file" 
+                                                        onChange={(event) => {
+                                                            
+                                                            const reader = new FileReader();
+                                                            
+                                                            reader.onload = function () {
+                                                                setImagen(reader.result);
+                                                            }
+                                                            reader.readAsDataURL(event.target.files[0]);
+                                                        }} 
+                                                    />     
+                                                    <Avatar sx={{backgroundColor: "#6030c4"}}>
+                                                        <AddAPhotoOutlined/>
+                                                    </Avatar>
+                                                </IconButton>
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <Avatar variant='square' src={imagen} sx={{ml:"7%",width:"480px", height:"150px"}}/>
+                                    </Badge>
+                                </Stack>
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
+                                    <TextField 
+                                        value={programa}
+                                        label='Programa' 
+                                        onChange={(event)=>{ setPrograma(event.target.value)}}
+                                        sx={{width:"56%"}}
                                     />
-                                } 
-                                label={emergente_activo ? "activo":"inactivo"}
-                                sx={{ml:7}}
-                            />
-                        </Box>
-                        <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
-                            <TextField 
-                                label='Capacidad'
-                                sx={{width:"27%"}}
-                            />
-                            <FormControl sx ={{width: "50%", marginLeft: "2%"}}>
-                                <InputLabel required>Dependencia</InputLabel>
-                                <Select
-                                    value={dependencia}
-                                    label="Dependencia"
-                                    onChange={(event) => { setDependencia(event.target.value) }}
-                                    MenuProps={{
-                                        style:{
-                                            maxHeight: 160
-                                        }
-                                    }}
-                                >
-                                {combodependencias.map((option)=> (
-                                    <MenuItem key={option.id} value={option.id}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                        <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
-                            <FormControl sx ={{width: "37%"}}>
-                                <InputLabel required>Tipo programa</InputLabel>
-                                <Select
-                                    value={tipoprograma}
-                                    label="Tipo Programa"
-                                    onChange={(event) => { setTipoprograma(event.target.value) }}
-                                    MenuProps={{
-                                        style:{
-                                            maxHeight: 160
-                                        }
-                                    }}
-                                >
-                                {combotipoprogramas.map((option)=> (
-                                    <MenuItem key={option.id} value={option.id}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                                </Select>
-                            </FormControl>
-                            <FormControl sx ={{width: "40%", ml: "2%"}}>
-                                <InputLabel required>Modalidad</InputLabel>
-                                <Select
-                                    value={modalidad}
-                                    label="Modalidad"
-                                    onChange={(event) => { setModalidad(event.target.value) }}
-                                    MenuProps={{
-                                        style:{
-                                            maxHeight: 160
-                                        }
-                                    }}
-                                >
-                                {combomodalidades.map((option)=> (
-                                    <MenuItem key={option.id} value={option.id}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                        <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
-                            <LocalizationProvider dateAdapter={AdapterMoment}>
-                                <DatePicker
-                                    label="Fecha inicio"
-                                    value={fecha_inicio}
-                                    inputFormat = "DD/MM/YYYY"
-                                    onChange={ (date) => {
-                                        setFecha_inicio(date.format('YYYYMMDD'));
-                                    }}
-                                    renderInput={
-                                        (params) => <TextField {...params} required error={false} sx={{width: "38%"}}/>
-                                    }
-                                    
-                                />
-                                <DatePicker
-                                    label="Fecha final"
-                                    value={fecha_final}
-                                    inputFormat = "DD/MM/YYYY"
-                                    onChange={ (date) => {
-                                        setFecha_final(date.format('YYYYMMDD'));
-                                    }}
-                                    renderInput={
-                                        (params) => <TextField {...params} required error={false} sx={{ml: "2%", width: "40%"}} />}
-                                />
-                            </LocalizationProvider> 
-                        </Box>
-                        <Box display={'flex'} justifyContent={'center'} sx={{height:70,mt:6}}>
-                            <Box>
-                                <Button 
-                                    variant='contained' 
-                                    sx={{ml:3}} 
-                                    onClick={() => {submit}}
-                                >
-                                    {emergente_crear ? 'Crear': 'Guardar' }
-                                </Button>
-                            </Box>
+                                    <FormControlLabel 
+                                        control={
+                                            <Switch
+                                            checked={emergente_activo}
+                                            onChange={ () => { setEmergente_activo(!emergente_activo)}}
+                                            />
+                                        } 
+                                        label={emergente_activo ? "activo":"inactivo"}
+                                        sx={{ml:"10%"}}
+                                    />
+                                </Box>
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
+                                    <TextField
+                                        value={capacidad} 
+                                        label='Capacidad'
+                                        onChange={(event) => { setCapacidad(event.target.value)}}
+                                        sx={{width:"27%"}}
+                                    />
+                                    <FormControl sx ={{width: "56%", marginLeft: "3%"}}>
+                                        <InputLabel required>Dependencia</InputLabel>
+                                        <Select
+                                            value={dependencia}
+                                            label="Dependencia"
+                                            onChange={(event) => { setDependencia(event.target.value) }}
+                                            MenuProps={{
+                                                style:{
+                                                    maxHeight: 160
+                                                }
+                                            }}
+                                        >
+                                        {combodependencias.map((option)=> (
+                                            <MenuItem key={option.id} value={option.id}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
+                                    <FormControl sx ={{width: "42%"}}>
+                                        <InputLabel required>Tipo programa</InputLabel>
+                                        <Select
+                                            value={tipoprograma}
+                                            label="Tipo Programa"
+                                            onChange={(event) => { setTipoprograma(event.target.value) }}
+                                            MenuProps={{
+                                                style:{
+                                                    maxHeight: 160
+                                                }
+                                            }}
+                                        >
+                                        {combotipoprogramas.map((option)=> (
+                                            <MenuItem key={option.id} value={option.id}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl sx ={{width: "42%", ml: "2%"}}>
+                                        <InputLabel required>Modalidad</InputLabel>
+                                        <Select
+                                            value={modalidad}
+                                            label="Modalidad"
+                                            onChange={(event) => { setModalidad(event.target.value) }}
+                                            MenuProps={{
+                                                style:{
+                                                    maxHeight: 160
+                                                }
+                                            }}
+                                        >
+                                        {combomodalidades.map((option)=> (
+                                            <MenuItem key={option.id} value={option.id}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
+                                    <LocalizationProvider dateAdapter={AdapterMoment}>
+                                        <DatePicker
+                                            label="Fecha inicio"
+                                            value={fecha_inicio}
+                                            inputFormat = "DD/MM/YYYY"
+                                            onChange={ (date) => {
+                                                setFecha_inicio(date.format('YYYYMMDD'));
+                                            }}
+                                            renderInput={
+                                                (params) => <TextField {...params} required error={false} sx={{width: "42%"}}/>
+                                            }
+                                            
+                                        />
+                                        <DatePicker
+                                            label="Fecha final"
+                                            value={fecha_final}
+                                            inputFormat = "DD/MM/YYYY"
+                                            onChange={ (date) => {
+                                                setFecha_final(date.format('YYYYMMDD'));
+                                            }}
+                                            renderInput={
+                                                (params) => <TextField {...params} required error={false} sx={{ml: "2%", width: "42%"}} />}
+                                        />
+                                    </LocalizationProvider> 
+                                </Box>
+                                <Box display={'flex'} justifyContent={'center'} sx={{height:55,mt:"7%"}}>
+                                    <Box>
+                                        <Button 
+                                            variant='contained' 
+                                            sx={{ml:3}} 
+                                            onClick={submit}
+                                        >
+                                            {emergente_crear ? 'Crear': 'Guardar' }
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </TabPanel>
                         </Box>
                     </>
                 ) : 
