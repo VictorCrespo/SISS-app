@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 
-import { 
+import {
+    Alert, 
     Box,
     Button,
     Card,
@@ -8,15 +9,100 @@ import {
     CardContent, 
     CardMedia,
     Collapse,
-    Grid, 
-    Typography 
+    Dialog,
+    DialogTitle,
+    Grid,
+    TextField, 
+    Tooltip,
+    Typography,
+    Snackbar
     } from "@mui/material";
 
-import Imagen from "../inscripcion/image/image.jpg"
+import moment from 'moment';
+
+import NotImage from '../programas/images/Not_image.jpeg'
 
 export function Inscripcion(){
 
+    const [openerror,setOpenError] = useState(false);
+
+    const [mensajeerror,setMensajeError] = useState('');
+
+    const [openmensaje,setOpenMensaje] = useState(false);
+    
+    const [emergente,setEmergente] = useState(false);
+
+    const [mensaje,setMensaje] = useState('');
+
+    const [programas,setProgramas] = useState([]);
+
+    const [alumnoid,setAlumnoid] = useState('');
+
+    const [creacion,setCreacion] = useState(true);
+
+    const [programa_id,setProgramaid] = useState('');
+
+    const [filtro, setFiltro] = useState('');
+
     const [expandedCard, setExpandedCard] = useState(null);
+
+    const [programa_seleccionado, setPrograma_seleccionado] = useState(null);
+
+    const submit = async () => {
+
+        let response,mensaje;
+        
+        const data = {
+            'alumno_id':parseInt(alumnoid),
+            'programa_id': parseInt(programa_seleccionado)
+        }
+
+        if(creacion){
+            try {
+                response = await fetch('http://localhost:8080/alumnos/programas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                mensaje = 'Inscrito al programa con exito'
+                setMensaje(mensaje);
+                setOpenMensaje(true);
+                setExpandedCard(null);
+                setEmergente(false)
+            } catch (error) {
+                setMensajeError(error.message);
+                setOpenError(true);
+            }
+
+        }else{
+            try {
+                response = await fetch('http://localhost:8080/alumnos/'+alumnoid+'/programas/'+programa_id, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                mensaje = 'Cambiado de programa con exito'
+                setMensaje(mensaje);
+                setOpenMensaje(true);
+                setExpandedCard(null);
+                setEmergente(false)
+            } catch (error) {
+                setMensajeError(error.message);
+                setOpenError(true);
+            }
+        }
+        
+    }
+
+    const programaSeleccionar = (id) => {
+        
+        const seleccionado = programas.find((programas) => programas.id === id)
+        setPrograma_seleccionado(seleccionado.id);
+    };
 
     const ExpandirCard = (id) => {
         if (expandedCard === id) {
@@ -26,96 +112,233 @@ export function Inscripcion(){
         }
     };
 
-    let programas = [
-        {
-            "id": 1,
-            "titulo": "Oficina servicio social",
-            "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
-            "image": Imagen
-        },
-        {   
-            "id": 2,
-            "titulo": "Oficina servicio social",
-            "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
-            "image": Imagen
-        },
-        {
-            "id": 3,
-            "titulo": "Oficina servicio social",
-            "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
-            "image": Imagen
-        },
-        {   
-            "id": 4,
-            "titulo": "Oficina servicio social",
-            "texto": "Apoyo en las oficinas del servicio social atendiendo a gente via correo",
-            "image": Imagen
-        },
-    ];
+    const cerrarError = (event, reason) => {
+        
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenError(false);
+    };
+
+    const cerrarMensaje = (event, reason) => {
+        
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenMensaje(false);
+    };
+
+    async function getProgramas () {
+        try {
+            const response = await fetch('http://localhost:8080/programas?activo=1')
+            const data = await response.json()
+            setProgramas(data)
+        } catch (error) {
+            setMensajeError(error.message);
+            setOpenError(true);
+        }
+    }
+
+    async function getAlumnosProgramas () {
+        try {
+            let response = await fetch('http://localhost:8080/usuarios/1')
+            let data = await response.json()
+            setAlumnoid(data.Alumno[0].id);
+            response = await fetch('http://localhost:8080/alumnos/programas?alumno_id='+data.Alumno[0].id)
+            data = await response.json()
+            setProgramaid(data[0].programa_id);
+        } catch (error) {
+            setMensajeError(error.message);
+            setOpenError(true);
+        }
+    }
+
+    useEffect( () => {
+        getAlumnosProgramas();
+        getProgramas();
+    },[]);
 
     return (
-            <Box>
-                <Grid container rowSpacing={5} spacing={7}>
-                    {programas.map(({id,titulo,texto,image}) => (
-                        <Grid item xl={3} lg={4} md={6} sm={12} key={id}>
-                            <Card
-                                sx={{backgroundColor:"#1e1e1e"}}
-                            >
-                                <CardMedia  
-                                    component="img" 
-                                    title="" 
-                                    image={image}
-                                    height = "150"
-                                />
+        <Box>
+            <TextField 
+                label={'Programas'} 
+                onChange={ (event) => {
+                    setFiltro(event.target.value)
+                }}
+                sx={{width:"50%"}}
+            />
+            <Grid container rowSpacing={5} spacing={7} sx={{mt:3}}>
+                {programas.filter(({nombre}) => nombre.includes(filtro)).map((
+                    {id,nombre,fecha_inicio,fecha_fin,imagen,Dependencia,capacidad},index) => (
+                    <Grid item xl={3} lg={4} md={6} sm={12} key={id}>
+                        <Card
+                            sx={{backgroundColor:"#797880d1"}}
+                        >
+                            <CardMedia  
+                                component="img" 
+                                src={imagen ? imagen:NotImage}
+                                height = "150"
+                            />
+                            <CardContent>
+                                <Typography gutterBottom variant="h5" color={"white"} component="div">
+                                    <b>{nombre}</b>
+                                </Typography>
+                            </CardContent>
+                            <CardActions sx={{justifyContent:"space-between"}}>
+                                <Tooltip title="Ver información del programa">
+                                    <Button 
+                                        size="small" 
+                                        variant="text" 
+                                        onClick={ () => {ExpandirCard(id);  programaSeleccionar(id);} } sx={{color:"white"}}
+                                    >
+                                        Leer mas
+                                    </Button>
+                                </Tooltip>
+                            </CardActions>
+                            <Collapse  in={expandedCard === id} timeout="auto" unmountOnExit>
                                 <CardContent>
-                                    <Typography gutterBottom variant="h5" color={"white"} component="div">
-                                        {titulo}
+                                    <Typography  color={"white"} sx={{mt:2}}>
+                                        <b>Dependencia:</b> {Dependencia.nombre}
                                     </Typography>
-                                    <Typography variant="body2" color={"white"}>
-                                        {texto}
+                                    <Typography  color={"white"} sx={{mt:2}}>
+                                        <b>Capacidad:</b> {capacidad}
                                     </Typography>
+                                    <Typography  color={"white"} sx={{mt:2}}>
+                                        <b>Direccion:</b> {Dependencia.domicilio}
+                                    </Typography>
+                                    <Typography  color={"white"} sx={{mt:2}}>
+                                        <b>Fecha de inicio:</b> {moment(fecha_inicio).format("DD/MM/YYYY")}
+                                    </Typography>
+                                    <Typography color={"white"} sx={{mt:2}}>
+                                        <b>Fecha de fin:</b> {moment(fecha_fin).format("DD/MM/YYYY")}
+                                    </Typography>
+                                    
+                                    {programas[index].Actividad.map(({descripcion,id},index) => (
+                                        
+                                        <Typography key={id} color={"white"} sx={{mt:2}}>
+                                            {"Actividad "+(index+1)+": "}{descripcion}
+                                        </Typography>
+                                    ))}
+                                    <CardActions sx={{justifyContent:'center', marginTop:2}}>
+                                            <Button 
+                                                size="small" 
+                                                variant="contained"
+                                                onClick={()=>{
+                                                    if (programa_id === ''){
+                                                        setCreacion(true);
+                                                        setEmergente(true);
+                                                    }else{
+                                                        if(programa_id === programa_seleccionado){
+                                                            setMensajeError('No puedes inscribirte al mismo programa');
+                                                            setOpenError(true);
+                                                            return
+                                                        }
+                                                        setCreacion(false);
+                                                        setEmergente(true);
+                                                    }
+                                                    
+                                                }}
+                                            >
+                                                Inscribirse
+                                            </Button> 
+                                    </CardActions>
                                 </CardContent>
-                                <CardActions sx={{justifyContent:"space-between"}}>
-                                    <Button size="small" variant="text" onClick={() => ExpandirCard(id)} sx={{color:"white"}}>Leer mas</Button> 
-                                    {/* <Button size="small" variant="contained">Inscribirse</Button>  */}
-                                </CardActions>
-                                <Collapse  in={expandedCard === id} timeout="auto" unmountOnExit>
-                                    <CardContent>
-                                        <Typography paragraph color={'white'}>Method:</Typography>
-                                        <Typography paragraph color={'white'}>
-                                            Heat 1/2 cup of the broth in a pot until simmering, add saffron and set
-                                            aside for 10 minutes.
-                                        </Typography>
-                                        <Typography paragraph color={'white'}>
-                                            Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over
-                                            medium-high heat. Add chicken, shrimp and chorizo, and cook, stirring
-                                            occasionally until lightly browned, 6 to 8 minutes. Transfer shrimp to a
-                                            large plate and set aside, leaving chicken and chorizo in the pan. Add
-                                            pimentón, bay leaves, garlic, tomatoes, onion, salt and pepper, and cook,
-                                            stirring often until thickened and fragrant, about 10 minutes. Add
-                                            saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
-                                        </Typography>
-                                        <Typography paragraph color={'white'}>
-                                            Add rice and stir very gently to distribute. Top with artichokes and
-                                            peppers, and cook without stirring, until most of the liquid is absorbed,
-                                            15 to 18 minutes. Reduce heat to medium-low, add reserved shrimp and
-                                            mussels, tucking them down into the rice, and cook again without
-                                            stirring, until mussels have opened and rice is just tender, 5 to 7
-                                            minutes more. (Discard any mussels that don&apos;t open.)
-                                        </Typography>
-                                        <Typography color={'white'}>
-                                            Set aside off of the heat to let rest for 10 minutes, and then serve.
-                                        </Typography>
-                                        <CardActions sx={{justifyContent:'center', marginTop:2}}>
-                                            <Button size="small" variant="contained" sx={{backgroundColor: "#a7a7a7"}}>Inscribirse</Button> 
-                                        </CardActions>
-                                    </CardContent>
-                                </Collapse>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+                            </Collapse>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+            <Snackbar 
+                open={openerror} 
+                autoHideDuration={6000} 
+                anchorOrigin={{vertical:'bottom',horizontal:'right'}}
+                spacing={2} 
+                sx={{ width: '25%' }}
+                onClose={cerrarError}
+                >
+                <Alert onClose={cerrarError} severity='error' sx={{ width: '100%' }}>
+                    {mensajeerror}
+                </Alert>
+            </Snackbar>
+            <Snackbar 
+                open={openmensaje} 
+                autoHideDuration={6000} 
+                anchorOrigin={{vertical:'bottom',horizontal:'right'}}
+                spacing={2} 
+                sx={{ width: '25%' }}
+                onClose={cerrarMensaje}
+                >
+                <Alert onClose={cerrarMensaje} severity='success' sx={{ width: '100%' }}>
+                    {mensaje}
+                </Alert>
+            </Snackbar>
+            <Dialog 
+                open={emergente} 
+                onClose={() => { setEmergente(false);}}
+                maxWidth={'sm'} 
+                fullWidth={true}
+            >
+                {creacion? 
+                    (
+                        <>
+                            <DialogTitle variant='h5' align='center'>
+                                Inscripción a un programa
+                            </DialogTitle>
+                            <Box>
+                                <Typography variant='h6' align='center'>
+                                    Estas seguro de inscribirte al programa {programa_seleccionado}?
+                                </Typography>
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:75}}>
+                                    <Button 
+                                        variant='contained' 
+                                        sx={{mr:5}} 
+                                        onClick={ submit }
+                                    >
+                                        Aceptar
+                                    </Button>
+                                    <Button 
+                                        variant='contained'
+                                        onClick={ () => { setEmergente(false); }}
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </>
+                    )
+                    :
+                    (
+                        <>
+                            <DialogTitle variant='h5' align='center'>
+                                Cambiar de programa
+                            </DialogTitle>
+                            <Box>
+                                <Typography variant='h6' align='center'>
+                                    Estas seguro de cambiar de programa ?
+                                </Typography>
+                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:75}}>
+                                    <Button 
+                                        variant='contained' 
+                                        sx={{mr:5}} 
+                                        onClick={ submit }
+                                    >
+                                        Aceptar
+                                    </Button>
+                                    <Button 
+                                        variant='contained'
+                                        onClick={ () => { setEmergente(false); }}
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </>
+                    )
+                }
+            </Dialog>
+        </Box>
         
     )
 }
