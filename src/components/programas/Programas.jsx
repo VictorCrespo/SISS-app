@@ -14,6 +14,7 @@ import {
     CardActions,
     CardContent, 
     CardMedia,
+    Checkbox,
     Collapse,
     Dialog,
     DialogTitle,
@@ -23,8 +24,13 @@ import {
     InputLabel,
     IconButton,
     MenuItem,
-    Tab,
-    Tabs,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     TextField,
     Tooltip,
     Typography,
@@ -34,7 +40,7 @@ import {
     Switch
 } from '@mui/material'
 
-import {AddAPhotoOutlined} from '@mui/icons-material';
+import {AddAPhotoOutlined,Article,Edit,Delete} from '@mui/icons-material';
 
 import {  
     DatePicker, 
@@ -45,40 +51,8 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 
 import NotImage from './images/Not_image.jpeg'
 
-function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-            <Box sx={{ p: 3 }}>
-                <Typography>{children}</Typography>
-            </Box>
-            )}
-        </div>
-    );
-}
-
-TabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
-
 export function Programas() {
-
+    //Componentes
     const [openerror,setOpenError] = useState(false);
 
     const [mensajeerror,setMensajeError] = useState('');
@@ -87,7 +61,10 @@ export function Programas() {
 
     const [expandedCard, setExpandedCard] = useState(null);
 
-    //Componentes
+    const [activo,setactivo] = useState(true);
+
+    const [filtro, setFiltro] = useState('');
+
     const [combodependencias,setCombodependencias] = useState([]);
 
     const [combotipoprogramas,setCombotipoprogramas] = useState([]);
@@ -95,6 +72,9 @@ export function Programas() {
     const [combomodalidades,setCombomodalidades] = useState([]);
 
     const [mensaje,setMensaje] = useState('');
+
+    //Valores
+    const [programa_seleccionado, setPrograma_seleccionado] = useState(null);
     
     const [imagen,setImagen] = useState(null);
 
@@ -114,15 +94,10 @@ export function Programas() {
 
     const [fecha_final,setFecha_final] = useState('');
 
-    const [botones,setBotones] = useState(true);
-
-    const [activo,setactivo] = useState(true);
-
-    const [filtro, setFiltro] = useState('');
-
-    // Son de las ventanas emergentes
-    
+    //  ventanas emergentes
     const [emergente,setEmergente] = useState(false);
+
+    const [emergente_actividades,setEmergente_actividades] = useState(false);
 
     const [emergente_crear,setEmergente_crear] = useState(true);
 
@@ -130,9 +105,17 @@ export function Programas() {
 
     const [emergente_datos,setEmergente_datos] = useState(true);
 
-    const [tab, setTab] = useState(0);
+    const [emergente_programa, setEmergente_programa] = useState(true);
 
-    const submit = async () => {
+    const [actividad,setActividad] = useState('');
+
+    const [actividades,setActividades] = useState([]);
+
+    const [actividad_seleccionada, setActividad_seleccionada] = useState(null);
+
+    const [botones,setBotones] = useState(true);
+
+    const submitPrograma = async () => {
 
         let response,mensaje;
         
@@ -202,6 +185,12 @@ export function Programas() {
                 return
             }
 
+            if (parseInt(fecha_inicio) > parseInt(fecha_final)){
+                setMensajeError('La fecha inicio no puede ser mayor a la fecha final');
+                setOpenError(true);
+                return
+            }
+
             const data = {
                 'imagen': imagen,
                 'nombre': programa,
@@ -223,17 +212,17 @@ export function Programas() {
                         },
                         body: JSON.stringify(data)
                     });
-                    mensaje = 'tipo de programa creado con éxito'
+                    mensaje = 'Programa creado con éxito'
                 }
                 else{
-                    response = await fetch('http://localhost:8080/programas/'+fila_selecionada, {
+                    response = await fetch('http://localhost:8080/programas/'+programa_seleccionado, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(data)
                     });
-                    mensaje = 'tipo de programa modificado con éxito'
+                    mensaje = 'Programa modificado con éxito'
                 }
 
                 if (!response.ok){
@@ -243,7 +232,6 @@ export function Programas() {
                 setMensaje(mensaje);
                 setOpenMensaje(true);
                 setEmergente(false)
-                setBotones(true)
                 getProgramas();
                 
             } catch (error) {
@@ -254,14 +242,14 @@ export function Programas() {
         else{
 
             try {
-                response = await fetch('http://localhost:8080/programas/'+fila_selecionada,{
+                response = await fetch('http://localhost:8080/programas/'+programa_seleccionado,{
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 });
                 
-                mensaje = 'Se elimino correctamente'
+                mensaje = 'Programa eliminado correctamente '
 
                 if (!response.ok){
                     throw new Error('Error al enviar los datos');
@@ -270,8 +258,7 @@ export function Programas() {
                 setMensaje(mensaje);
                 setOpenMensaje(true);
                 setEmergente(false)
-                setBotones(true)
-                getModalidades();
+                getProgramas();
 
             } catch (error) {
                 setMensajeError(error.message);
@@ -280,6 +267,95 @@ export function Programas() {
         }
     }
 
+    const submitActividad = async () => {
+
+        let response,mensaje;
+        
+        if (emergente_datos){
+            
+            let expresionregular = /^[A-Za-z0-9 ]+$/
+
+            if (actividad.trim() === '') {
+                setMensajeError('La actividad es obligatorio');
+                setOpenError(true);
+                return
+            }
+    
+            if (!expresionregular.test(actividad)){
+                setMensajeError('La actividad tiene caracteres no validos');
+                setOpenError(true);
+                return
+            }
+
+            const data = {
+                'descripcion': actividad,
+                'programa_id': parseInt(programa_seleccionado)
+            }; 
+
+            try {
+                if (emergente_crear){
+                    response = await fetch('http://localhost:8080/actividades', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    mensaje = 'Actividad creada con éxito'
+                }
+                else{
+                    response = await fetch('http://localhost:8080/actividades/'+actividad_seleccionada, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    mensaje = 'Actividad modificada con éxito'
+                }
+
+                if (!response.ok){
+                    throw new Error('Error al enviar los datos');
+                }
+
+                setMensaje(mensaje);
+                setOpenMensaje(true);
+                setEmergente_actividades(false);
+                setEmergente(false)
+                getProgramas();
+
+            } catch (error) {
+                setMensajeError(error.message);
+                setOpenError(true);
+            }
+        }
+        else{
+
+            try {
+                response = await fetch('http://localhost:8080/actividades/'+actividad_seleccionada,{
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                mensaje = 'Actividad eliminado correctamente '
+
+                if (!response.ok){
+                    throw new Error('Error al enviar los datos');
+                }
+
+                setMensaje(mensaje);
+                setOpenMensaje(true);
+                setEmergente(false)
+                getProgramas();
+
+            } catch (error) {
+                setMensajeError(error.message);
+                setOpenError(true);
+            }
+        }
+    }
     const cerrarError = (event, reason) => {
         
         if (reason === 'clickaway') {
@@ -305,6 +381,45 @@ export function Programas() {
             setExpandedCard(id);
         }
     };
+
+    const programaSeleccionar = (id,programa) => {
+
+        const seleccionado = programas.find((programas) => programas.id === id)
+        setPrograma_seleccionado(seleccionado.id);
+
+        if (programa){
+            setImagen(seleccionado.imagen ? seleccionado.imagen: '');
+            setPrograma(seleccionado.nombre);
+            setEmergente_activo(activo);
+            setCapacidad(seleccionado.capacidad.toString());
+            setDependencia(seleccionado.dependencia_id.toString());
+            setTipoprograma(seleccionado.tipo_programa_id.toString());
+            setModalidad(seleccionado.modalidad_id.toString());
+            setFecha_inicio(moment(seleccionado.fecha_inicio).format('YYYYMMDD'));
+            setFecha_final(moment(seleccionado.fecha_fin).format('YYYYMMDD'));
+        }else{
+            setActividades(seleccionado.Actividad);
+        }
+
+};
+
+    const actividadSeleccionar = (id) => {
+        
+        if (actividad_seleccionada === id) {
+            setEmergente_crear(true);
+            setActividad('');
+            setBotones(true);
+            setActividad_seleccionada(null);
+
+        } else {
+            const seleccionado = programas.find((programa) => programa.Actividad.find((actividad) => actividad.id === id));
+            const actividad = seleccionado.Actividad.find((actividad)=> actividad.id === id)
+            setEmergente_crear(false);
+            setActividad(actividad.descripcion);
+            setBotones(false);
+            setActividad_seleccionada(id);
+        }
+    }
 
     async function getDependencias () {
         try {
@@ -334,7 +449,6 @@ export function Programas() {
         try {
             const response = await fetch('http://localhost:8080/programas?activo='+(activo ? 1:0))
             const data = await response.json()
-            console.log(data)
             setProgramas(data)
         } catch (error) {
             setMensajeError(error.message);
@@ -365,7 +479,6 @@ export function Programas() {
     },[activo]);
 
 
-
     return (
         <Box>
             <Box display={'flex'} sx={{ height: 55}}>
@@ -378,11 +491,21 @@ export function Programas() {
                         sx={{ml:4}} 
                         onClick={ () => 
                             {  
-                                setBotones(true); 
                                 setEmergente_activo(true); 
-                                setEmergente(true); 
+                                setEmergente_programa(true);
+                                setBotones(true);
+                                setImagen('');
+                                setPrograma('');
+                                setEmergente_activo(activo);
+                                setCapacidad('');
+                                setDependencia('');
+                                setTipoprograma('');
+                                setModalidad('');
+                                setFecha_inicio('');
+                                setFecha_final('');
                                 setEmergente_crear(true); 
                                 setEmergente_datos(true);
+                                setEmergente(true); 
                             }
                         }
                     >
@@ -403,10 +526,12 @@ export function Programas() {
             </Box>
             <Box>
                 <Grid container rowSpacing={5} spacing={7}>
-                    {programas.filter(({nombre}) => nombre.includes(filtro)).map(({id,nombre,fecha_inicio,fecha_fin,imagen}) => (
+                    {programas.filter(({nombre}) => nombre.includes(filtro)).map((
+                        {id,nombre,fecha_inicio,fecha_fin,imagen,Dependencia,capacidad},index) => (
                         <Grid item xl={3} lg={4} md={6} sm={12} key={id}>
                             <Card
                                 sx={{backgroundColor:"#797880d1"}}
+                                
                             >
                                 <CardMedia  
                                     component="img" 
@@ -415,20 +540,85 @@ export function Programas() {
                                 />
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" color={"white"} component="div">
-                                        {nombre}
+                                        <b>{nombre}</b>
                                     </Typography>
                                 </CardContent>
                                 <CardActions sx={{justifyContent:"space-between"}}>
-                                    <Button size="small" variant="text" onClick={() => ExpandirCard(id)} sx={{color:"white"}}>Leer mas</Button>
+                                    <Tooltip title="Ver información del programa">
+                                        <Button 
+                                            size="small" 
+                                            variant="text" 
+                                            onClick={ () => ExpandirCard(id)} sx={{color:"white"}}
+                                        >
+                                            Leer mas
+                                        </Button>
+                                    </Tooltip>
+                                    <Stack direction="row" spacing={1}>
+                                        <Tooltip title="Actividades">
+                                            <IconButton onClick={ () => {
+                                                    setEmergente_programa(false);
+                                                    programaSeleccionar(id,false)
+                                                    setEmergente_crear(true);
+                                                    setEmergente_datos(true);
+                                                    setBotones(true);
+                                                    setActividad_seleccionada(null);
+                                                    setActividad('');
+                                                    setEmergente(true); 
+                                                }}
+                                            >
+                                                <Article sx={{color:'white'}}/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Editar programa">
+                                            <IconButton onClick={ () => { 
+                                                    setEmergente_programa(true);
+                                                    programaSeleccionar(id,true)
+                                                    setEmergente_crear(false); 
+                                                    setEmergente_datos(true);
+                                                    setEmergente(true); 
+                                                }}
+                                            >
+                                                <Edit sx={{color: 'white'}}/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Borrar programa">
+                                            <IconButton onClick={() =>{
+                                                    programaSeleccionar(id,true)
+                                                    setEmergente_programa(true);
+                                                    setEmergente_crear(false); 
+                                                    setEmergente_datos(false);
+                                                    setEmergente(true); 
+                                                }}
+                                            >
+                                                <Delete sx={{color: 'white'}}/>
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Stack>
                                 </CardActions>
                                 <Collapse  in={expandedCard === id} timeout="auto" unmountOnExit>
                                     <CardContent>
-                                        <Typography variant="body2" color={"white"} sx={{mt:2}}>
-                                            Fecha de inicio: {moment(fecha_inicio).format("DD/MM/YYYY")}
+                                        <Typography  color={"white"} sx={{mt:2}}>
+                                            <b>Dependencia:</b> {Dependencia.nombre}
                                         </Typography>
-                                        <Typography variant="body2" color={"white"} sx={{mt:2}}>
-                                            Fecha de fin: {moment(fecha_fin).format("DD/MM/YYYY")}
+                                        <Typography  color={"white"} sx={{mt:2}}>
+                                            <b>Capacidad:</b> {capacidad}
                                         </Typography>
+                                        <Typography  color={"white"} sx={{mt:2}}>
+                                            <b>Direccion:</b> {Dependencia.domicilio}
+                                        </Typography>
+                                        <Typography  color={"white"} sx={{mt:2}}>
+                                            <b>Fecha de inicio:</b> {moment(fecha_inicio).format("DD/MM/YYYY")}
+                                        </Typography>
+                                        <Typography color={"white"} sx={{mt:2}}>
+                                            <b>Fecha de fin:</b> {moment(fecha_fin).format("DD/MM/YYYY")}
+                                        </Typography>
+                                        
+                                        {programas[index].Actividad.map(({descripcion,id},index) => (
+                                            
+                                            <Typography key={id} color={"white"} sx={{mt:2}}>
+                                                {"Actividad "+(index+1)+": "}{descripcion}
+                                            </Typography>
+                                        ))}
                                     </CardContent>
                                 </Collapse>
                             </Card>
@@ -462,31 +652,26 @@ export function Programas() {
             </Snackbar>
             <Dialog 
                 open={emergente} 
-                onClose={() => { setEmergente(false) }}
+                onClose={() => { setEmergente(false); setEmergente_actividades(false); }}
                 maxWidth={'sm'} 
                 fullWidth={true}
             >
             {emergente_datos ? 
                 (
                     <>
-                        <DialogTitle variant='h6' align='center'>
-                            {emergente_crear ? 'Crear programa': 'Modificar programa'}
-                        </DialogTitle>
-                        <Box>
-                            <Tabs value={tab} onChange={(event,newValue) =>{ setTab(newValue)}}>
-                                <Tab label="Programa" {...a11yProps(0)}/>
-                                <Tab label="Actividades" {...a11yProps(1)}/>
-                            </Tabs>
-                        </Box>
-                        <Box>
-                            <TabPanel value={tab} index={0}>
-                                <Stack direction={"row"} mt={3}>
+                        {emergente_programa ? 
+                            (
+                                <Box>
+                                    <DialogTitle variant='h6' align='center'>
+                                        {emergente_crear ? 'Crear Programa': 'Modificar Programa'}
+                                    </DialogTitle>
+                                    <Stack direction={"row"} mt={3}>
                                     <Badge
                                         overlap="circular"
                                         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                                         badgeContent={
                                             <Tooltip title="Subir Foto">
-                                                <IconButton aria-label="upload picture" component="label" sx={{ p: 0, ml: "180px", mt:"40px" }} >
+                                                <IconButton aria-label="upload picture" component="label" sx={{ p: 0, ml: "200px", mt:"40px" }} >
                                                     <input 
                                                         hidden 
                                                         accept="image/*" 
@@ -508,162 +693,293 @@ export function Programas() {
                                             </Tooltip>
                                         }
                                     >
-                                        <Avatar variant='square' src={imagen} sx={{ml:"7%",width:"480px", height:"150px"}}/>
+                                        <Avatar variant='square' src={imagen} sx={{ml:"8%",width:"520px", height:"150px"}}/>
                                     </Badge>
-                                </Stack>
-                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
-                                    <TextField 
-                                        value={programa}
-                                        label='Programa' 
-                                        onChange={(event)=>{ setPrograma(event.target.value)}}
-                                        sx={{width:"56%"}}
-                                    />
-                                    <FormControlLabel 
-                                        control={
-                                            <Switch
-                                            checked={emergente_activo}
-                                            onChange={ () => { setEmergente_activo(!emergente_activo)}}
+                                    </Stack>
+                                    <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
+                                        <TextField 
+                                            value={programa}
+                                            label='Programa' 
+                                            onChange={(event)=>{ setPrograma(event.target.value)}}
+                                            sx={{width:"56%"}}
+                                        />
+                                        <FormControlLabel 
+                                            control={
+                                                <Switch
+                                                checked={emergente_activo}
+                                                onChange={ () => { setEmergente_activo(!emergente_activo)}}
+                                                />
+                                            } 
+                                            label={emergente_activo ? "activo":"inactivo"}
+                                            sx={{ml:"10%"}}
+                                        />
+                                    </Box>
+                                    <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
+                                        <TextField
+                                            value={capacidad} 
+                                            label='Capacidad'
+                                            onChange={(event) => { setCapacidad(event.target.value)}}
+                                            sx={{width:"27%"}}
+                                        />
+                                        <FormControl sx ={{width: "56%", marginLeft: "3%"}}>
+                                            <InputLabel required>Dependencia</InputLabel>
+                                            <Select
+                                                value={dependencia}
+                                                label="Dependencia"
+                                                onChange={(event) => { setDependencia(event.target.value) }}
+                                                MenuProps={{
+                                                    style:{
+                                                        maxHeight: 160
+                                                    }
+                                                }}
+                                            >
+                                            {combodependencias.map((option)=> (
+                                                <MenuItem key={option.id} value={option.id}>
+                                                    {option.label}
+                                                </MenuItem>
+                                            ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                    <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
+                                        <FormControl sx ={{width: "42%"}}>
+                                            <InputLabel required>Tipo programa</InputLabel>
+                                            <Select
+                                                value={tipoprograma}
+                                                label="Tipo Programa"
+                                                onChange={(event) => { setTipoprograma(event.target.value) }}
+                                                MenuProps={{
+                                                    style:{
+                                                        maxHeight: 160
+                                                    }
+                                                }}
+                                            >
+                                            {combotipoprogramas.map((option)=> (
+                                                <MenuItem key={option.id} value={option.id}>
+                                                    {option.label}
+                                                </MenuItem>
+                                            ))}
+                                            </Select>
+                                        </FormControl>
+                                        <FormControl sx ={{width: "42%", ml: "2%"}}>
+                                            <InputLabel required>Modalidad</InputLabel>
+                                            <Select
+                                                value={modalidad}
+                                                label="Modalidad"
+                                                onChange={(event) => { setModalidad(event.target.value) }}
+                                                MenuProps={{
+                                                    style:{
+                                                        maxHeight: 160
+                                                    }
+                                                }}
+                                            >
+                                            {combomodalidades.map((option)=> (
+                                                <MenuItem key={option.id} value={option.id}>
+                                                    {option.label}
+                                                </MenuItem>
+                                            ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                    <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
+                                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                                            <DatePicker
+                                                label="Fecha inicio"
+                                                value={fecha_inicio}
+                                                inputFormat = "DD/MM/YYYY"
+                                                onChange={ (date) => {
+                                                    setFecha_inicio(date.format('YYYYMMDD'));
+                                                }}
+                                                renderInput={
+                                                    (params) => <TextField {...params} required error={false} sx={{width: "42%"}}/>
+                                                }
+                                                
                                             />
-                                        } 
-                                        label={emergente_activo ? "activo":"inactivo"}
-                                        sx={{ml:"10%"}}
-                                    />
-                                </Box>
-                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
-                                    <TextField
-                                        value={capacidad} 
-                                        label='Capacidad'
-                                        onChange={(event) => { setCapacidad(event.target.value)}}
-                                        sx={{width:"27%"}}
-                                    />
-                                    <FormControl sx ={{width: "56%", marginLeft: "3%"}}>
-                                        <InputLabel required>Dependencia</InputLabel>
-                                        <Select
-                                            value={dependencia}
-                                            label="Dependencia"
-                                            onChange={(event) => { setDependencia(event.target.value) }}
-                                            MenuProps={{
-                                                style:{
-                                                    maxHeight: 160
-                                                }
-                                            }}
-                                        >
-                                        {combodependencias.map((option)=> (
-                                            <MenuItem key={option.id} value={option.id}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                        </Select>
-                                    </FormControl>
-                                </Box>
-                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
-                                    <FormControl sx ={{width: "42%"}}>
-                                        <InputLabel required>Tipo programa</InputLabel>
-                                        <Select
-                                            value={tipoprograma}
-                                            label="Tipo Programa"
-                                            onChange={(event) => { setTipoprograma(event.target.value) }}
-                                            MenuProps={{
-                                                style:{
-                                                    maxHeight: 160
-                                                }
-                                            }}
-                                        >
-                                        {combotipoprogramas.map((option)=> (
-                                            <MenuItem key={option.id} value={option.id}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl sx ={{width: "42%", ml: "2%"}}>
-                                        <InputLabel required>Modalidad</InputLabel>
-                                        <Select
-                                            value={modalidad}
-                                            label="Modalidad"
-                                            onChange={(event) => { setModalidad(event.target.value) }}
-                                            MenuProps={{
-                                                style:{
-                                                    maxHeight: 160
-                                                }
-                                            }}
-                                        >
-                                        {combomodalidades.map((option)=> (
-                                            <MenuItem key={option.id} value={option.id}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                        </Select>
-                                    </FormControl>
-                                </Box>
-                                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{mt:"7%"}}>
-                                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                                        <DatePicker
-                                            label="Fecha inicio"
-                                            value={fecha_inicio}
-                                            inputFormat = "DD/MM/YYYY"
-                                            onChange={ (date) => {
-                                                setFecha_inicio(date.format('YYYYMMDD'));
-                                            }}
-                                            renderInput={
-                                                (params) => <TextField {...params} required error={false} sx={{width: "42%"}}/>
-                                            }
-                                            
-                                        />
-                                        <DatePicker
-                                            label="Fecha final"
-                                            value={fecha_final}
-                                            inputFormat = "DD/MM/YYYY"
-                                            onChange={ (date) => {
-                                                setFecha_final(date.format('YYYYMMDD'));
-                                            }}
-                                            renderInput={
-                                                (params) => <TextField {...params} required error={false} sx={{ml: "2%", width: "42%"}} />}
-                                        />
-                                    </LocalizationProvider> 
-                                </Box>
-                                <Box display={'flex'} justifyContent={'center'} sx={{height:55,mt:"7%"}}>
-                                    <Box>
-                                        <Button 
-                                            variant='contained' 
-                                            sx={{ml:3}} 
-                                            onClick={submit}
-                                        >
-                                            {emergente_crear ? 'Crear': 'Guardar' }
-                                        </Button>
+                                            <DatePicker
+                                                label="Fecha final"
+                                                value={fecha_final}
+                                                inputFormat = "DD/MM/YYYY"
+                                                onChange={ (date) => {
+                                                    setFecha_final(date.format('YYYYMMDD'));
+                                                }}
+                                                renderInput={
+                                                    (params) => <TextField {...params} required error={false} sx={{ml: "2%", width: "42%"}} />}
+                                            />
+                                        </LocalizationProvider> 
+                                    </Box>
+                                    <Box display={'flex'} justifyContent={'center'} sx={{height:55,mt:"7%"}}>
+                                        <Box>
+                                            <Button 
+                                                variant='contained' 
+                                                sx={{ml:3}} 
+                                                onClick={submitPrograma}
+                                            >
+                                                {emergente_crear ? 'Crear': 'Guardar' }
+                                            </Button>
+                                        </Box>
                                     </Box>
                                 </Box>
-                            </TabPanel>
-                        </Box>
+                            ):
+                            (
+                                <Box>
+                                    <DialogTitle variant='h6' align='center'>
+                                        {emergente_crear ? 'Crear Actividades': 'Modificar Actividades'}
+                                    </DialogTitle>
+                                    <Box display={'flex'} justifyContent={'center'} sx={{mt:3}}>
+                                    <Button 
+                                        variant='contained' 
+                                        sx={{ml:4}} 
+                                        onClick={ () => 
+                                            {  
+                                                setBotones(true);
+                                                setActividad_seleccionada(null);
+                                                setActividad('');
+                                                setEmergente_datos(true);
+                                                setEmergente_crear(true);
+                                                setEmergente_actividades(!emergente_actividades);
+                                                
+                                            }
+                                        }
+                                    >
+                                        {emergente_crear?'Nuevo':'Editar'}
+                                    </Button>
+                                    <Button 
+                                        variant='contained'
+                                        disabled = {botones} 
+                                        sx={{ml:4}}
+                                        onClick = {() => 
+                                            { 
+                                                setEmergente_datos(false);
+                                            }
+                                        }
+                                    >
+                                        Borrar
+                                    </Button>
+                                    </Box>
+                                    <Collapse in={emergente_actividades} timeout="auto" unmountOnExit>
+                                        <Box display={'flex'} justifyContent={'space-around'} alignItems={'center'} sx={{mt:5}}>
+                                            <TextField 
+                                                value={actividad} 
+                                                label='Descripción' 
+                                                multiline 
+                                                minRows={4} 
+                                                maxRows={4} 
+                                                onChange={(event) => { setActividad(event.target.value)}}
+                                                sx={{width:"75%",mt:1}}/
+                                            >
+                                            <Box>
+                                                <Button 
+                                                    variant='contained' 
+                                                    sx={{justifyContent:'end'}}
+                                                    onClick={ submitActividad }
+                                                >
+                                                    {emergente_crear ? 'Crear':'Guardar' }
+                                                </Button>
+                                            </Box>
+                                                
+                                        </Box>
+                                        
+                                    </Collapse>
+                                    <Box sx={{mt:1}}>
+                                        <TableContainer component={Paper} sx={{mt:5,mb:5,ml:2,mr:2, width:550}}>
+                                            <Table aria-label="simple table">
+                                                <TableHead sx={{backgroundColor:'#bfa0ff'}}>
+                                                    <TableRow>
+                                                        <TableCell  padding="checkbox"/>
+                                                        <TableCell>
+                                                            <Typography variant='h6'>Actividad</Typography>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody sx={{maxHeight: 150}}>
+                                                    {actividades.map(({id,descripcion}) =>  (
+                                                        <TableRow
+                                                            key={id}
+                                                            selected={actividad_seleccionada === id}
+                                                            onClick={() => actividadSeleccionar(id)}
+                                                        >
+                                                            <TableCell padding="checkbox" sx={{borderRight:1}}>
+                                                                <Checkbox 
+                                                                    color="primary"
+                                                                    checked={actividad_seleccionada === id}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell component="th" scope="row">
+                                                                <Typography>{descripcion}</Typography>
+                                                            </TableCell>
+                                                        </TableRow> 
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </Box>
+                                </Box>
+                            )
+                        }
                     </>
                 ) : 
                 (
                     <>
-                        <DialogTitle variant='h5' align='center'>
-                            Borrar tipo de programa
-                        </DialogTitle>
-                        <Box>
-                            <Typography variant='h6' align='center'>
-                                Estas seguro que deseas Borrar al modalidad "{nombre_selccionado}" ?
-                            </Typography>
-                            <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:75}}>
-                                <Button 
-                                    variant='contained' 
-                                    sx={{mr:5}} 
-                                    onClick={ submit }
-                                >
-                                    Aceptar
-                                </Button>
-                                <Button 
-                                    variant='contained'
-                                    onClick={ () => { setEmergente(false) }}
-                                >
-                                    Cancelar
-                                </Button>
-                            </Box>
-                        </Box>
+                        {emergente_programa? 
+                            (
+                                <>
+                                    <DialogTitle variant='h5' align='center'>
+                                        Borrar programa
+                                    </DialogTitle>
+                                    <Box>
+                                        <Typography variant='h6' align='center'>
+                                            Estas seguro que deseas borrar el programa "{programa}" ?
+                                        </Typography>
+                                        <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:75}}>
+                                            <Button 
+                                                variant='contained' 
+                                                sx={{mr:5}} 
+                                                onClick={ submitPrograma }
+                                            >
+                                                Aceptar
+                                            </Button>
+                                            <Button 
+                                                variant='contained'
+                                                onClick={ () => { setEmergente(false) }}
+                                            >
+                                                Cancelar
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                </>
+                            )
+                            :
+                            (
+                                <>
+                                    <DialogTitle variant='h5' align='center'>
+                                        Borrar actividad
+                                    </DialogTitle>
+                                    <Box>
+                                        <Typography variant='h6' align='center'>
+                                            Estas seguro que deseas borrar la actividad "{actividad}" ?
+                                        </Typography>
+                                        <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:75}}>
+                                            <Button 
+                                                variant='contained' 
+                                                sx={{mr:5}} 
+                                                onClick={ submitActividad }
+                                            >
+                                                Aceptar
+                                            </Button>
+                                            <Button 
+                                                variant='contained'
+                                                onClick={ () => { setEmergente(false); }}
+                                            >
+                                                Cancelar
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                </>
+                            )
+                        }
                     </>
-                )}
+                )
+            }
             </Dialog>
         </Box>
     );
