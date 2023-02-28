@@ -22,7 +22,7 @@ import moment from 'moment';
 
 import NotImage from '../programas/images/Not_image.jpeg'
 
-export function Inscripcion(){
+export function Inscripcion({usuario_id}){
 
     const [openerror,setOpenError] = useState(false);
 
@@ -148,7 +148,7 @@ export function Inscripcion(){
 
     async function getAlumnosProgramas () {
         try {
-            let response = await fetch('http://localhost:8080/usuarios/2')
+            let response = await fetch('http://localhost:8080/usuarios/'+usuario_id)
             let data = await response.json()
 
             if(data.length < 1){
