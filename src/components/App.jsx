@@ -74,6 +74,8 @@ export function App(){
 
     const [anchorElUser, setAnchorElUser] = useState(null);
 
+    const [usuarioid,setUsuarioid] = useState(localStorage.getItem('usuario_id'));
+
     const abrirMenuPerfil = (event) => {
         setAnchorElUser(event.currentTarget);
     };
@@ -236,7 +238,7 @@ export function App(){
                                 <Route path="/" element={<h1>home</h1>} />
                                 <Route path="/alumnos_inscritos" element={<Alumnos_Inscritos/>} />
                                 <Route path="/inscripcion" element={<Inscripcion/>} />
-                                <Route path="/mi_cuenta" element={<Micuenta/>} />
+                                <Route path="/mi_cuenta" element={<Micuenta usuarioid={usuarioid}/>} />
                                 <Route path="/programas" element={<Programas/>} />
                                 <Route path="/tipos_programas" element={<Tipos_programas/>} />
                                 <Route path="/usuarios" element={<Usuarios/>} />
