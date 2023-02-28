@@ -74,6 +74,20 @@ async function loginUser(credentials) {
     }).then(data => data.json())
 }
 
+
+async function userId(usuario){
+
+    let response = await fetch('http://localhost:8080/usuarios?usuario='+usuario, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    const data = await response.json()
+
+    localStorage.setItem('usuario_id',data[0].id)
+}
 export function Login({ setToken }){
 
     const [openerror,setOpenError] = useState(false);
@@ -144,6 +158,7 @@ export function Login({ setToken }){
         event.preventDefault();
     };
 
+
     const submit = async () => {
     
         let expresionregular = /^[A-Za-z0-9 ]+$/
@@ -161,6 +176,8 @@ export function Login({ setToken }){
                 setOpenError(true);
                 return
             }
+
+            await userId(usuario)
 
             const token = await loginUser({
                 'Nombre':usuario,
@@ -223,7 +240,7 @@ export function Login({ setToken }){
 
             try {
 
-                const response = await fetch('http://localhost:8080/usuarios', {
+                let response = await fetch('http://localhost:8080/usuarios', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -234,6 +251,8 @@ export function Login({ setToken }){
                 if (!response.ok){
                     throw new Error('Error al enviar los datos');
                 }
+
+                await userId(usuario)
 
                 const token = await loginUser({
                     'Nombre':usuarioc,
