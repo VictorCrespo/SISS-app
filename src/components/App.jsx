@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
 import { 
-    createBrowserRouter,
-    RouterProvider 
+    BrowserRouter as Router, 
+    Route, 
+    Routes
 } from 'react-router-dom'
 
 import {
@@ -41,6 +42,10 @@ import {
 
 import { Purple } from "./themes/themecofig"
 
+import useToken from '../components/App/useToken'
+
+import { LoginRK } from '../components/login/LoginRK';
+
 import { Alumnos_Inscritos } from './alumnos-inscritos/Alumnos-inscritos';
 
 import { Dependencias } from './datos/dependencias/Dependencias';
@@ -59,46 +64,12 @@ import { Usuarios } from './datos/usuarios/Usuarios'
 
 import Logo from './image/SISS.png'
 
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <h1>Home</h1>
-    },
-    {
-        path: "/alumnos_inscritos",
-        element: <Alumnos_Inscritos/>
-    },
-    {
-        path: "/inscripcion",
-        element: <Inscripcion/>
-    },
-    {
-        path: "/dependencias",
-        element: <Dependencias/>
-    },
-    {
-        path: "/mi_cuenta",
-        element: <Micuenta/>
-    },
-    {
-        path: "/modalidades",
-        element: <Modalidades/>
-    },
-    {
-        path: "/programas",
-        element: <Programas/>
-    },
-    {
-        path: "/tipos_programas",
-        element: <Tipos_programas/>
-    },
-    {
-        path: "/usuarios",
-        element: <Usuarios/>
-    },
-])
-
 export function App(){
+
+    const { token, setToken } = useToken();
+    if(token  === "" || token === undefined) {
+        return <LoginRK setToken={setToken} />
+    }
 
     const drawerWidth = 200;
 
@@ -119,11 +90,6 @@ export function App(){
             "text": "Cuenta",
             "route": "/mi_cuenta",
             "icon": <AccountCircle/>
-        },
-        {
-            "text": "Cerra sesión",
-            "route": "/Login",
-            "icon": <Logout/>
         }
     ];
 
@@ -162,14 +128,24 @@ export function App(){
                                 <List>
                                     {opcionesPerfil.map(({ text, route, icon }) => (
                                         <ListItem key={text} disablePadding>
-                                        <ListItemButton onClick={cerrarMenuPerfil} href={route}>
-                                            <ListItemIcon>
-                                                {icon}
-                                            </ListItemIcon>
-                                            <ListItemText primary={text} />
-                                        </ListItemButton>
+                                            <ListItemButton onClick={cerrarMenuPerfil} href={route}>
+                                                <ListItemIcon>
+                                                    {icon}
+                                                </ListItemIcon>
+                                                <ListItemText primary={text} />
+                                            </ListItemButton>
                                         </ListItem>
                                     ))}
+                                    <ListItem disablePadding>
+                                        <ListItemButton 
+                                            onClick={()=>{localStorage.removeItem('token'); location.reload();}}
+                                        >
+                                            <ListItemIcon>
+                                                <Logout/>
+                                            </ListItemIcon>
+                                            <ListItemText primary={"Cerrar Session"} />
+                                        </ListItemButton>
+                                    </ListItem>
                                 </List>
                             </Menu>
                         </Box>
@@ -237,15 +213,31 @@ export function App(){
                                         </ListItemIcon>
                                         <ListItemText primary={'Tipo de programas'} />
                                     </ListItemButton>
+                                    <ListItemButton href='/carreras' sx={{ pl: 4 }}>
+                                        <ListItemIcon>
+                                            <School/>
+                                        </ListItemIcon>
+                                        <ListItemText primary={'Carreras'} />
+                                    </ListItemButton>
                                 </List>
                             </Collapse>
                         </List>
                     </Box>
                 </Drawer>
-                <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                    <Toolbar />
-                    <RouterProvider router={router}/>
-                </Box>
+                    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                        <Toolbar />
+                        <Router>
+                            <Routes>
+                                <Route path="/" element={<h1>home</h1>} />
+                                <Route path="/alumnos_inscritos" element={<Alumnos_Inscritos/>} />
+                                <Route path="/inscripcion" element={<Inscripcion/>} />
+                                <Route path="/mi_cuenta" element={<Micuenta/>} />
+                                <Route path="/programas" element={<Programas/>} />
+                                <Route path="/tipos_programas" element={<Tipos_programas/>} />
+                                <Route path="/usuarios" element={<Usuarios/>} />
+                            </Routes>
+                        </Router>
+                    </Box>
             </ThemeProvider> 
         </Box>
     )
