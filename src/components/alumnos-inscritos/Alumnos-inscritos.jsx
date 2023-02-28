@@ -12,7 +12,9 @@ import {
     Grid,
     TextField,
     Typography,
-    Snackbar
+    Snackbar,
+    Dialog,
+    DialogTitle
 } from "@mui/material"
 
 import { FileDownload } from "@mui/icons-material";
@@ -28,6 +30,10 @@ export function Alumnos_Inscritos() {
     const [alumnos,setAlumnos]= useState([]);
 
     const [filtro, setFiltro] = useState('');
+
+    const [emergente,setEmergente] = useState(false);
+
+    const [cantidad,setCantidad] = useState('');
 
     const cerrarError = (event, reason) => {
         
@@ -57,6 +63,45 @@ export function Alumnos_Inscritos() {
         }
     } 
 
+    const submit = async () => {
+        
+        if(cantidad.trim()===''){
+            setMensajeError('La cantidad es obligatoria');
+            setOpenError(true);
+            return
+        }
+
+        if(parseInt(cantidad) < 1){
+            setMensajeError('La cantidad de alumnos no puede ser cero o menor');
+            setOpenError(true);
+            return
+        }
+
+        try {
+
+        const response = await fetch('http://localhost:8080/usuarios/exportar/'+parseInt(cantidad));
+        
+        const blob = await response.blob();
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        
+        a.href = url;
+        a.download = 'Alumnos';
+        document.body.appendChild(a);
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+        setEmergente(false);
+
+        } catch (error) {
+            setMensajeError(error.message);
+            setOpenError(true);
+        }
+    };
+
     useEffect( () => {
         getAlumnos();
     },[]);
@@ -67,7 +112,14 @@ export function Alumnos_Inscritos() {
                 <TextField label={'Nombre'} sx={{ height:40, flexGrow:1}} onChange={ (event) => {
                     setFiltro(event.target.value)}}
                 />
-                <Button variant="contained"  endIcon={<FileDownload/>} sx={{ml:3,flexGrow:0}}>Exportar excel</Button>
+                <Button 
+                    variant="contained"  
+                    endIcon={<FileDownload/>} 
+                    sx={{ml:3,flexGrow:0}}
+                    onClick={()=>{ setEmergente(true)}}
+                >
+                    Exportar excel
+                </Button>
             </Box>
             <Grid container rowSpacing={5} spacing={7} sx={{mt:1}}>
                 {alumnos.filter((alumno) =>  alumno.Alumno.nombrecompleto.includes(filtro)).map((alumno) => (
@@ -129,6 +181,25 @@ export function Alumnos_Inscritos() {
                     {mensajeerror}
                 </Alert>
             </Snackbar>
+            <Dialog
+                open={emergente} 
+                onClose={() => { setEmergente(false) }}
+                maxWidth={'sm'} 
+                fullWidth={true}
+            >
+                <DialogTitle variant='h6' align='center'>
+                    Exportación Excel
+                </DialogTitle>
+                <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:120}}>
+                            <TextField 
+                                value={cantidad} 
+                                label='Cantidad de alumnos por hoja' 
+                                onChange={(event) => { setCantidad(event.target.value) }}  
+                                sx={{width:250}}
+                            />
+                            <Button variant='contained' sx={{ml:3}} onClick={submit}>Aceptar</Button>
+                        </Box>
+            </Dialog>
         </Box>
     )
 }
