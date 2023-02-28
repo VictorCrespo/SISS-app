@@ -26,7 +26,7 @@ import {AddAPhotoOutlined,Save} from '@mui/icons-material';
 import ImagenMicuenta from './images/Micuenta.svg'
 
 
-export function Micuenta({usuarioid}) {
+export function Micuenta({usuario_id}) {
 
     const [nuevoregistro,setNuevoregistros] = useState(false);
 
@@ -42,6 +42,9 @@ export function Micuenta({usuarioid}) {
     const [comboCarrera,setcomboCarrera] = useState([]);
 
     //Valores
+
+    const [alumnoid,setAlumnoid] = useState(0);
+
     const [foto,setFoto] = useState(null);
 
     const [nombrecompleto, setNombrecompleto] = useState('');
@@ -95,7 +98,7 @@ export function Micuenta({usuarioid}) {
     async function getDatos() {
         try {
 
-            let response = await fetch('http://localhost:8080/usuarios/'+usuarioid)
+            let response = await fetch('http://localhost:8080/usuarios/'+usuario_id)
 
             let data = await response.json()
 
@@ -104,6 +107,8 @@ export function Micuenta({usuarioid}) {
                 return  
             }
 
+            setAlumnoid(data.Alumno[0].id)
+            
             response = await fetch('http://localhost:8080/alumnos/'+data.Alumno[0].id)
 
             data = await response.json()
@@ -253,7 +258,7 @@ export function Micuenta({usuarioid}) {
             'periodo': periodo,
             'semestre': parseInt(semestre),
             'porcentaje_creditos_a': parseInt(creditos),
-            'usuario_id': parseInt(usuarioid) //Cambiar el usuario id queda pendiente
+            'usuario_id': parseInt(usuario_id) //Cambiar el usuario id queda pendiente
         };
 
         try {
@@ -271,7 +276,7 @@ export function Micuenta({usuarioid}) {
                 mensaje = 'Datos registrados con éxito'
             }
             else{
-                response = await fetch('http://localhost:8080/alumnos/3', {
+                response = await fetch('http://localhost:8080/alumnos/'+alumnoid, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
