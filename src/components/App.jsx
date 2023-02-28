@@ -44,7 +44,7 @@ import { Purple } from "./themes/themecofig"
 
 import useToken from '../components/App/useToken'
 
-import { LoginRK } from '../components/login/LoginRK';
+import { Login } from '../components/login/Login';
 
 import { Alumnos_Inscritos } from './alumnos-inscritos/Alumnos-inscritos';
 
@@ -93,7 +93,7 @@ export function App(){
     if(token  === "" || token === undefined) {
         return (
             <ThemeProvider theme={Purple}>
-                <LoginRK setToken={setToken} />
+                <Login setToken={setToken} />
             </ThemeProvider>
         )
     }
