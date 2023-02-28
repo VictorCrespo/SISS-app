@@ -64,6 +64,8 @@ import { Usuarios } from './datos/usuarios/Usuarios'
 
 import { Carreras } from './datos/carreras/Carreras';
 
+import { Home } from './home/Home';
+
 import Logo from './image/SISS.png'
 
 export function App(){
@@ -237,7 +239,7 @@ export function App(){
                         <Toolbar />
                         <Router>
                             <Routes>
-                                <Route path="/" element={<h1>home</h1>} />
+                                <Route path="/" element={<Home usuario_id={usuarioid}/>} />
                                 <Route path="/alumnos_inscritos" element={<Alumnos_Inscritos/>} />
                                 <Route path="/inscripcion" element={<Inscripcion usuario_id={usuarioid}/>} />
                                 <Route path="/mi_cuenta" element={<Micuenta usuarioid={usuarioid}/>} />
