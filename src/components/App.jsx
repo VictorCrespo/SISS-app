@@ -242,6 +242,10 @@ export function App(){
                                 <Route path="/programas" element={<Programas/>} />
                                 <Route path="/tipos_programas" element={<Tipos_programas/>} />
                                 <Route path="/usuarios" element={<Usuarios/>} />
+                                <Route path="/dependencias" element={<Dependencias/>}/>
+                                <Route path="/modalidades" element={<Modalidades/>}/>
+                                <Route path="/tipo_programas" element={<Tipos_programas/>}/>
+                                <Route path="/carreras" element={<h1>Carreras</h1>}/>
                             </Routes>
                         </Router>
                     </Box>
