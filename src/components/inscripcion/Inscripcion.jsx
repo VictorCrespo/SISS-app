@@ -143,11 +143,22 @@ export function Inscripcion(){
 
     async function getAlumnosProgramas () {
         try {
-            let response = await fetch('http://localhost:8080/usuarios/1')
+            let response = await fetch('http://localhost:8080/usuarios/2')
             let data = await response.json()
+
+            if(data.length < 1){
+                return
+            }
+
             setAlumnoid(data.Alumno[0].id);
             response = await fetch('http://localhost:8080/alumnos/programas?alumno_id='+data.Alumno[0].id)
+
             data = await response.json()
+
+            if(data.length < 1){
+                return
+            }
+
             setProgramaid(data[0].programa_id);
         } catch (error) {
             setMensajeError(error.message);
