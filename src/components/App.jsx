@@ -237,7 +237,7 @@ export function App(){
                             <Routes>
                                 <Route path="/" element={<h1>home</h1>} />
                                 <Route path="/alumnos_inscritos" element={<Alumnos_Inscritos/>} />
-                                <Route path="/inscripcion" element={<Inscripcion/>} />
+                                <Route path="/inscripcion" element={<Inscripcion usuario_id={usuarioid}/>} />
                                 <Route path="/mi_cuenta" element={<Micuenta usuarioid={usuarioid}/>} />
                                 <Route path="/programas" element={<Programas/>} />
                                 <Route path="/tipos_programas" element={<Tipos_programas/>} />
