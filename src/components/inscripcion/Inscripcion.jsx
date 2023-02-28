@@ -72,7 +72,8 @@ export function Inscripcion(){
                 setMensaje(mensaje);
                 setOpenMensaje(true);
                 setExpandedCard(null);
-                setEmergente(false)
+                setEmergente(false);
+                getAlumnosProgramas();
             } catch (error) {
                 setMensajeError(error.message);
                 setOpenError(true);
@@ -91,7 +92,8 @@ export function Inscripcion(){
                 setMensaje(mensaje);
                 setOpenMensaje(true);
                 setExpandedCard(null);
-                setEmergente(false)
+                setEmergente(false);
+                getAlumnosProgramas();
             } catch (error) {
                 setMensajeError(error.message);
                 setOpenError(true);
