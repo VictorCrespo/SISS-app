@@ -91,7 +91,11 @@ export function App(){
     ];
 
     if(token  === "" || token === undefined) {
-        return <LoginRK setToken={setToken} />
+        return (
+            <ThemeProvider theme={Purple}>
+                <LoginRK setToken={setToken} />
+            </ThemeProvider>
+        )
     }
 
     return(
