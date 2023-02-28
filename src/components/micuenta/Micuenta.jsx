@@ -442,7 +442,7 @@ export function Micuenta({usuarioid}) {
                         <TextField
                             required
                             value={creditos} 
-                            label="% creditos aprobados" 
+                            label="No. creditos aprobados" 
                             sx ={{width: "33%", marginLeft: "2%"}}
                             onChange={(event) => { setCreditos(event.target.value) }}  
                         />
