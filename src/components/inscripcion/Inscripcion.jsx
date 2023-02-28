@@ -48,6 +48,8 @@ export function Inscripcion(){
 
     const [programa_seleccionado, setPrograma_seleccionado] = useState(null);
 
+    const [nombreprograma,setNombreprograma] = useState('');
+
     const submit = async () => {
 
         let response,mensaje;
@@ -102,6 +104,7 @@ export function Inscripcion(){
         
         const seleccionado = programas.find((programas) => programas.id === id)
         setPrograma_seleccionado(seleccionado.id);
+        setNombreprograma(seleccionado.nombre);
     };
 
     const ExpandirCard = (id) => {
@@ -299,7 +302,7 @@ export function Inscripcion(){
                             </DialogTitle>
                             <Box>
                                 <Typography variant='h6' align='center'>
-                                    Estas seguro de inscribirte al programa {programa_seleccionado}?
+                                    Estas seguro de inscribirte al programa "{nombreprograma}" ?
                                 </Typography>
                                 <Box display={'flex'} alignItems={'center'} justifyContent={'center'} sx={{height:75}}>
                                     <Button 
