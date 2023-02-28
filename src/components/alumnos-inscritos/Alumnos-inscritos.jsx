@@ -10,10 +10,12 @@ import {
     CardContent,
     Collapse,
     Grid,
+    TextField,
     Typography,
     Snackbar
 } from "@mui/material"
 
+import { FileDownload } from "@mui/icons-material";
 
 export function Alumnos_Inscritos() {
 
@@ -24,6 +26,8 @@ export function Alumnos_Inscritos() {
     const [expand,setExpand] = useState(false);
 
     const [alumnos,setAlumnos]= useState([]);
+
+    const [filtro, setFiltro] = useState('');
 
     const cerrarError = (event, reason) => {
         
@@ -59,48 +63,54 @@ export function Alumnos_Inscritos() {
 
     return(
         <Box>
-            <Grid container rowSpacing={5} spacing={7}>
-                {alumnos.map((Alumnos) => (
-                    <Grid key={Alumnos.Alumno.id} item xl={3} lg={4} md={6} sm={12}>
+            <Box display={'flex'} sx={{ height: 55}}>
+                <TextField label={'Nombre'} sx={{ height:40, flexGrow:1}} onChange={ (event) => {
+                    setFiltro(event.target.value)}}
+                />
+                <Button variant="contained"  endIcon={<FileDownload/>} sx={{ml:3,flexGrow:0}}>Exportar excel</Button>
+            </Box>
+            <Grid container rowSpacing={5} spacing={7} sx={{mt:1}}>
+                {alumnos.filter((alumno) =>  alumno.Alumno.nombrecompleto.includes(filtro)).map((alumno) => (
+                    <Grid key={alumno.Alumno.id} item xl={3} lg={4} md={6} sm={12}>
                         <Card >
                             <Box display={ "flex" } sx={{justifyContent: "center"}}>
-                                <Avatar src={Alumnos.Alumno.foto} sx={{ width: 150, height: 150 }}/>    
+                                <Avatar src={alumno.Alumno.foto} sx={{ width: 150, height: 150 }}/>    
                             </Box>
                             <CardContent>
                                 <Box sx={{height: 70}}>
                                     <Typography gutterBottom variant="h5" component="div">
-                                        {Alumnos.Alumno.nombrecompleto}
+                                        {alumno.Alumno.nombrecompleto}
                                     </Typography>
                                 </Box>
                                 <Typography mt={1}>
-                                    <b>Carrera:</b> {Alumnos.Alumno.Carrera.nombre}
+                                    <b>Carrera:</b> {alumno.Alumno.Carrera.nombre}
                                 </Typography>
                                 
                                 <Typography mt={1}>
-                                    <b>No. Control:</b> {Alumnos.Alumno.no_control}
+                                    <b>No. Control:</b> {alumno.Alumno.no_control}
                                 </Typography>
-                                <Collapse in={expand === Alumnos.Alumno.id}>
+                                <Collapse in={expand === alumno.Alumno.id}>
                                         <Typography mt={1}>
-                                            <b>Sexo: </b>{Alumnos.Alumno.sexo === 'H'?'Hombre':'Mujer'}
+                                            <b>Sexo: </b>{alumno.Alumno.sexo === 'H'?'Hombre':'Mujer'}
                                         </Typography>
                                         <Typography mt={1}>
-                                            <b>Domicilio: </b>{Alumnos.Alumno.domicilio}
+                                            <b>Domicilio: </b>{alumno.Alumno.domicilio}
                                         </Typography>
                                         <Typography mt={1}>
-                                            <b>Telefono: </b>{Alumnos.Alumno.telefono}
+                                            <b>Telefono: </b>{alumno.Alumno.telefono}
                                         </Typography>
                                         <Typography mt={1}>
-                                            <b>Periodo: </b>{Alumnos.Alumno.periodo}
+                                            <b>Periodo: </b>{alumno.Alumno.periodo}
                                         </Typography>
                                         <Typography mt={1}>
-                                            <b>Semestre: </b>{Alumnos.Alumno.semestre}
+                                            <b>Semestre: </b>{alumno.Alumno.semestre}
                                         </Typography>
                                         <Typography mt={1}>
-                                            <b>Porcentaje de creditos aprobados: </b>{Alumnos.Alumno.porcentaje_creditos_a}%
+                                            <b>Porcentaje de creditos aprobados: </b>{alumno.Alumno.porcentaje_creditos_a}%
                                         </Typography>
                                 </Collapse>
                                 <CardActions sx={{display: "flex", justifyContent: "center", alignItems: "center", mt:2}}>
-                                    <Button variant="contained" onClick={() => { ExpandirCard(Alumnos.Alumno.id)}}>{expand === Alumnos.Alumno.id ?'ver menos':'Leer mas'}</Button>
+                                    <Button variant="contained" onClick={() => { ExpandirCard(alumno.Alumno.id)}}>{expand === alumno.Alumno.id ?'ver menos':'Leer mas'}</Button>
                                 </CardActions>
                             </CardContent>
                         </Card>
