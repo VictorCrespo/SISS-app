@@ -24,10 +24,9 @@ import {
 import {AddAPhotoOutlined,Save} from '@mui/icons-material';
 
 import ImagenMicuenta from './images/Micuenta.svg'
-import { width } from '@mui/system';
 
 
-export function Micuenta() {
+export function Micuenta({usuarioid}) {
 
     const [nuevoregistro,setNuevoregistros] = useState(false);
 
@@ -95,16 +94,20 @@ export function Micuenta() {
 
     async function getDatos() {
         try {
-            
-            const response = await fetch('http://localhost:8080/alumnos/3')
-            
-            if (response.status === 404){
+
+            let response = await fetch('http://localhost:8080/usuarios/'+usuarioid)
+
+            let data = await response.json()
+
+            if (data.Alumno.length === 0){
                 setNuevoregistros(true)
                 return  
             }
 
-            const data = await response.json()
-            console.log(data)
+            response = await fetch('http://localhost:8080/alumnos/'+data.Alumno[0].id)
+
+            data = await response.json()
+
             setFoto(data.foto)
             setNombrecompleto(data.nombrecompleto)
             setSexo(data.sexo)
@@ -250,7 +253,7 @@ export function Micuenta() {
             'periodo': periodo,
             'semestre': parseInt(semestre),
             'porcentaje_creditos_a': parseInt(creditos),
-            'usuario_id': 1 //Cambiar el usuario id queda pendiente
+            'usuario_id': parseInt(usuarioid) //Cambiar el usuario id queda pendiente
         };
 
         try {
