@@ -74,7 +74,7 @@ async function loginUser(credentials) {
     }).then(data => data.json())
 }
 
-export function LoginRK({ setToken }){
+export function Login({ setToken }){
 
     const [openerror,setOpenError] = useState(false);
 
@@ -428,6 +428,6 @@ export function LoginRK({ setToken }){
     );
 }
 
-LoginRK.propTypes = {
+Login.propTypes = {
     setToken: PropTypes.func.isRequired
 };
