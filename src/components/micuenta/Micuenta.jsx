@@ -42,6 +42,9 @@ export function Micuenta({usuarioid}) {
     const [comboCarrera,setcomboCarrera] = useState([]);
 
     //Valores
+
+    const [alumnoid,setAlumnoid] = useState(0);
+
     const [foto,setFoto] = useState(null);
 
     const [nombrecompleto, setNombrecompleto] = useState('');
@@ -104,6 +107,8 @@ export function Micuenta({usuarioid}) {
                 return  
             }
 
+            setAlumnoid(data.Alumno[0].id)
+            
             response = await fetch('http://localhost:8080/alumnos/'+data.Alumno[0].id)
 
             data = await response.json()
@@ -271,7 +276,7 @@ export function Micuenta({usuarioid}) {
                 mensaje = 'Datos registrados con éxito'
             }
             else{
-                response = await fetch('http://localhost:8080/alumnos/3', {
+                response = await fetch('http://localhost:8080/alumnos/'+alumnoid, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
