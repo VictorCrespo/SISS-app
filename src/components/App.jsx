@@ -242,7 +242,7 @@ export function App(){
                                 <Route path="/" element={<Home usuario_id={usuarioid}/>} />
                                 <Route path="/alumnos_inscritos" element={<Alumnos_Inscritos/>} />
                                 <Route path="/inscripcion" element={<Inscripcion usuario_id={usuarioid}/>} />
-                                <Route path="/mi_cuenta" element={<Micuenta usuarioid={usuarioid}/>} />
+                                <Route path="/mi_cuenta" element={<Micuenta usuario_id={usuarioid}/>} />
                                 <Route path="/programas" element={<Programas/>} />
                                 <Route path="/tipos_programas" element={<Tipos_programas/>} />
                                 <Route path="/usuarios" element={<Usuarios/>} />
