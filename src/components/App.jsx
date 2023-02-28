@@ -62,6 +62,8 @@ import { Tipos_programas } from './datos/tipos-programas/Tipos_programas'
 
 import { Usuarios } from './datos/usuarios/Usuarios'
 
+import { Carreras } from './datos/carreras/Carreras';
+
 import Logo from './image/SISS.png'
 
 export function App(){
@@ -245,7 +247,7 @@ export function App(){
                                 <Route path="/dependencias" element={<Dependencias/>}/>
                                 <Route path="/modalidades" element={<Modalidades/>}/>
                                 <Route path="/tipo_programas" element={<Tipos_programas/>}/>
-                                <Route path="/carreras" element={<h1>Carreras</h1>}/>
+                                <Route path="/carreras" element={<Carreras/>}/>
                             </Routes>
                         </Router>
                     </Box>
