@@ -81,7 +81,7 @@ export function Alumnos_Inscritos() {
                                 </Typography>
                                 <Collapse in={expand === Alumnos.Alumno.id}>
                                         <Typography mt={1}>
-                                            <b>Sexo: </b>{Alumnos.Alumno.sexo ='H'?'Hombre':'Mujer'}
+                                            <b>Sexo: </b>{Alumnos.Alumno.sexo === 'H'?'Hombre':'Mujer'}
                                         </Typography>
                                         <Typography mt={1}>
                                             <b>Domicilio: </b>{Alumnos.Alumno.domicilio}
