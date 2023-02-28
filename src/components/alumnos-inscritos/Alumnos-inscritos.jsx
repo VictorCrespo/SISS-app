@@ -106,7 +106,7 @@ export function Alumnos_Inscritos() {
                                             <b>Semestre: </b>{alumno.Alumno.semestre}
                                         </Typography>
                                         <Typography mt={1}>
-                                            <b>Porcentaje de creditos aprobados: </b>{alumno.Alumno.porcentaje_creditos_a}%
+                                            <b>No. de creditos aprobados: </b>{alumno.Alumno.porcentaje_creditos_a}
                                         </Typography>
                                 </Collapse>
                                 <CardActions sx={{display: "flex", justifyContent: "center", alignItems: "center", mt:2}}>
