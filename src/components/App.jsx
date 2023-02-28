@@ -67,9 +67,6 @@ import Logo from './image/SISS.png'
 export function App(){
 
     const { token, setToken } = useToken();
-    if(token  === "" || token === undefined) {
-        return <LoginRK setToken={setToken} />
-    }
 
     const drawerWidth = 200;
 
@@ -92,6 +89,10 @@ export function App(){
             "icon": <AccountCircle/>
         }
     ];
+
+    if(token  === "" || token === undefined) {
+        return <LoginRK setToken={setToken} />
+    }
 
     return(
         <Box sx={{ display: 'flex' }}>
